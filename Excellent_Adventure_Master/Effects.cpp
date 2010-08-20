@@ -87,7 +87,6 @@ int SimpleSpectrum(Canvas *c, EffectManager *em, char mode)
     return 1;
 }
 
-
 int WarpSpectrum(Canvas *c, EffectManager *em, char mode)
 {
     static unsigned short pos[CANVAS_WIDTH];
