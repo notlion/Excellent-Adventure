@@ -81,7 +81,7 @@ int SimpleSpectrum(Canvas *c, EffectManager *em, char mode)
 
         for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
         {
-            c->PutPixel(x,y, (bands[x] > high) ? color : 0);
+            c->PutPixel(x, y, (bands[x + 1] > high) ? color : 0);
         }
     }
     return 1;
@@ -109,9 +109,10 @@ int WarpSpectrum(Canvas *c, EffectManager *em, char mode)
     else{  // step
         unsigned short *spectrum = em->GetSpectrum();
         for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
-            if(spectrum[x] > 800)
+            short spc = spectrum[(x >> 1) + 3];
+            if(spc > 800)
                 ci = MOD32(ci + 1);
-            pos[x] -= ((short)spectrum[x] - 150) * 10;
+            pos[x] -= (spc - 150) * 10;
         }
     }
 
@@ -132,6 +133,36 @@ int WarpSpectrum(Canvas *c, EffectManager *em, char mode)
                     MAX(0, char(BLUE(px_color)) - 2)
                 ));
             }
+        }
+    }
+    
+    return 1;
+}
+
+int ElevatorSpectrum(Canvas *c, EffectManager *em, char mode)
+{
+    static unsigned short pos = 0;
+    static          short vel = 0;
+    
+    // step
+    unsigned short level = em->GetSpectrum()[4];
+    vel *= 0.95;
+    vel += level;
+    pos -= vel;
+
+    for(uint8_t y = 0; y < CANVAS_HEIGHT; y++){
+        Color_t color;
+        if(vel > 10000){
+            uint8_t cw_pos = (pos + (y << 12)) >> 11;
+            color = colorwheel_lut[cw_pos];
+        }
+        else{
+            uint8_t sin_pos = (pos + (y << 13)) >> 11;  // 65536 -> 32
+            uint8_t gs = sin_lut[sin_pos] >> 3;  // 256 -> 32
+            color = COLOR_B(gs, gs, gs);
+        }
+        for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
+            c->PutPixel(x, y, color);
         }
     }
     

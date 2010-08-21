@@ -88,7 +88,14 @@ void draw()
     }
 
     background(0);
+    
+    hint(ENABLE_DEPTH_TEST);
+    pushMatrix();
     drawBooth();
+    popMatrix();
+    
+    hint(DISABLE_DEPTH_TEST);
+    drawPixelArray();
 }
 
 
@@ -247,6 +254,18 @@ void drawBoothLED(int x, int y, float sc)
     for(int ix = -1; ix <= 1; ix++) {
         for(int iy = -1; iy <= 1; iy++) {
             ellipse(ix * sc, iy * sc, d, d);
+        }
+    }
+}
+
+
+void drawPixelArray()
+{
+    noStroke();
+    for(int y = YCOUNT; --y >= 0;){
+        for(int x = XCOUNT; --x >= 0;){
+            fill(pixelVals[x + y * XCOUNT]);
+            rect(x * 3, y * 3, 3, 3);
         }
     }
 }

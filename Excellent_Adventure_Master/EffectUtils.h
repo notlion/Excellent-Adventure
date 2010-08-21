@@ -40,9 +40,9 @@ Color_t lerpColor(Color_t c1, Color_t c2, float u)
     uint8_t g1 = GREEN(c1);
     uint8_t b1 = BLUE(c1);
     return COLOR_B(
-        (uint8_t)LERP(r1, RED(c2), u),
+        (uint8_t)LERP(r1, RED(c2),   u),
         (uint8_t)LERP(g1, GREEN(c2), u),
-        (uint8_t)LERP(b1, BLUE(c2), u)
+        (uint8_t)LERP(b1, BLUE(c2),  u)
     );
 }
 
