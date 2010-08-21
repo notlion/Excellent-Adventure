@@ -57,8 +57,8 @@ static final float PANEL_YOFFSET =
 static final int ANIMATION_MOUSE  =   0;
 static final int ANIMATION_SERIAL =  1;
 
-static final int I2C_FIRST_ADDRESS = 10;
-
+static final int I2C_FIRST_PANEL_ADDRESS = 10;
+static final int I2C_LAST_CEILING_ADDRESS = 5;
 float time0;
 char timeReset = 0;
 char resynch = TRUE;
@@ -68,7 +68,7 @@ int animationIndex = ANIMATION_SERIAL;
 AudioInput lineIn;
 FFT lineInFFT;
 
-int pixelCounter = -1;
+int pixelCounter = 0;
 
 void setup()
 {
@@ -181,27 +181,36 @@ void ProcessSerialAnimation()
 
         // Our I2C addresses are offset by 10, however, our LED "addresses"
         // begin at zero.
-        who -= I2C_FIRST_ADDRESS;
-        int x = who % XCOUNT;
-        int y = who / XCOUNT;
+        if (who >= I2C_FIRST_PANEL_ADDRESS)
+        {            
 
-        if 
-        (
-            (x >= 0) 
-        &&  (y >= 0) 
-        &&  (x < XCOUNT) 
-        &&  (y < PANEL_YCOUNT)
+            who -= I2C_FIRST_PANEL_ADDRESS;
+            int x = who % XCOUNT;
+            int y = who / XCOUNT;
 
-        )
+            if 
+            (
+                (x >= 0) 
+            &&  (y >= 0) 
+            &&  (x < XCOUNT) 
+            &&  (y < PANEL_YCOUNT)
+
+            )
+            {
+                setPixel(x, y, r, g, b);
+                println(pixelCounter + ": (" + (who+10) + ") " + x + " " + y + " -> " + r + " " + g + " " + b);
+            } else {
+                println(pixelCounter + ": (" + (who+10) + ") " + x + " " + y + 
+                    " -> " + r + " " + g + " " + b + " - ERROR");
+                resynch = TRUE;
+                return;
+            }
+        } 
+        else if (who <= I2C_LAST_CEILING_ADDRESS)
         {
-            setPixel(x, y, r, g, b);
-            println(pixelCounter + ": (" + (who+10) + ") " + x + " " + y + " -> " + r + " " + g + " " + b);
-        } else {
-            println(pixelCounter + ": (" + (who+10) + ") " + x + " " + y + 
-                " -> " + r + " " + g + " " + b + " - ERROR");
-            resynch = TRUE;
-            return;
-        }
+            // Render the ceiling 
+            println(pixelCounter + ": (" + (who) + ") Ceiling # " + who + " -> " + r + " " + g + " " + b);
+        } 
         pixelCounter++;
 
     }
