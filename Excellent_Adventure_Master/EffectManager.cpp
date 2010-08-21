@@ -169,43 +169,28 @@ void EffectManager :: Poll
     bool                                            offHook
 )
 {
+
+
+
     EM_DEBUG("BEGIN POLL");
     static bool runEffects = false;
-    //static int ringer = 0;
-    //ringer++;
     static unsigned short effectCount = 0;
     EM_DEBUG(effectCount);
    
-    if (effectCount == 0)
-    {
-        if (++m_currentIdle >= m_sizeIdle)
-        {
-            m_currentIdle = 0;
-        }
-        if (++m_currentRing >= m_sizeRing)
-        {
-            m_currentRing = 0;
-        }
-        if (++m_currentCall >= m_sizeCall)
-        {
-            m_currentCall = 0;
-        }
-        if (++m_currentOver >= m_sizeOver)
-        {
-            m_currentOver = 0;
-        }
-        effectCount = 4096 + (GetRandomNumber() >> 4);
-    }
-    effectCount--;
     
 
     if ((time - m_pollDelay) > EFFECT_POLL_DELAY_MS)
     {
+        //static int ringer = 0;
+        //ringer++;
+        
         m_pollDelay = time;
-        // Which index are we in the array of effects for this mode:
-        char currentEffect = 0; // 0 in case it is not specified
+        bool switchEffect = (effectCount == 0);
 
-        static Effect * e;
+        // Which index are we in the array of effects for this mode:
+        static char *currentEffect; // 0 in case it is not specified
+
+        static Effect * effects;
         switch (m_mode)
         {
         case EM_MODE_IDLE:
@@ -214,24 +199,36 @@ void EffectManager :: Poll
             if
             (
                 digitalRead(PHONE_PIN_RING_DETECT)
-            //||  (ringer & 4096)
+            //||  (ringer & 32)
             )
             {
                 m_mode = EM_MODE_RING;
-                currentEffect = m_currentRing;
             } else {
                 m_mode = EM_MODE_IDLE;
-                currentEffect = m_currentIdle;
+                if (switchEffect)
+                {
+                    if (++m_currentIdle >= m_sizeIdle)
+                    {
+                        m_currentIdle = 0;
+                    }
+                }
             }
-
+            
             if (offHook)
             {
                 m_mode = EM_MODE_CALL;
             }
-
             break;
         case EM_MODE_CALL:
-            currentEffect = m_currentCall;
+            if (switchEffect)
+            {
+                if (++m_currentCall >= m_sizeCall)
+                {
+                    m_currentCall = 0;
+                }
+                effectCount = 4096 + (GetRandomNumber() >> 4);
+            }
+            //currentEffect = m_currentCall;
             if (!offHook)
             {
                 m_mode = EM_MODE_CALLENDED;
@@ -242,8 +239,17 @@ void EffectManager :: Poll
             }
             break;
         case EM_MODE_CALL_OVERTIME:
+            if (switchEffect)
+            {
+                if (++m_currentOver >= m_sizeOver)
+                {
+                    m_currentOver = 0;
+                }
+
+            }            
+
             // Whoops, the person was on the line too long:
-            currentEffect = m_currentOver;
+            //currentEffect = m_currentOver;
             if (!offHook)
             {
                 m_mode = EM_MODE_CALLENDED;
@@ -263,20 +269,25 @@ void EffectManager :: Poll
 
         if (m_modePrevious != m_mode)
         {
+            // All variables in this section must be persistent
             runEffects = false;
             // Triggered once per mode change.
             switch(m_mode)
             {
             case EM_MODE_IDLE:
                 EM_DEBUG("POLL, ONCE: IDLE");
-                e = m_effectsIdle;
-                currentEffect = m_currentIdle;
+                effects = m_effectsIdle;
+                currentEffect = &m_currentIdle;
                 runEffects = true;
                 break;
             case EM_MODE_RING:
                 EM_DEBUG("POLL, ONCE: RING");
-                e = m_effectsRing;
-                currentEffect = m_currentRing;
+                effects = m_effectsRing;
+                currentEffect = &m_currentRing;
+                if (++m_currentRing >= m_sizeRing)
+                {
+                    m_currentRing = 0;
+                }
                 runEffects = true;
                 break;
             case EM_MODE_CALL:
@@ -287,8 +298,8 @@ void EffectManager :: Poll
                 m_duration = time;
                 effectCount = 0;
                 // Restore the lights!
-                currentEffect = m_currentCall;
-                e = m_effectsCall;
+                currentEffect = &m_currentCall;
+                effects = m_effectsCall;
                 runEffects = true;
                 break;               
             case EM_MODE_CALL_OVERTIME:
@@ -297,8 +308,8 @@ void EffectManager :: Poll
                 // person is taking too long
                 effectCount = 0;
                 // Restore the lights!
-                e = m_effectsOver;
-                currentEffect = m_currentOver;
+                effects = m_effectsOver;
+                currentEffect = &m_currentOver;
                 runEffects = true;
                 break;               
             case EM_MODE_CALLENDED:
@@ -348,11 +359,18 @@ void EffectManager :: Poll
         if (runEffects)
         {
             EM_DEBUG("runEffects");
-            EM_DEBUG((int)currentEffect);
+            EM_DEBUG((int)(*currentEffect));
+            //EM_DEBUG("ringer");
+            //EM_DEBUG((int)(ringer));
             m_spectrum.ReadSpectrum();
-            e[currentEffect].func(&m_canvas, const_cast<EffectManager *>(this), EFFECTMODE_LOOP);
+            effects[*currentEffect].func(&m_canvas, const_cast<EffectManager *>(this), EFFECTMODE_LOOP);
             m_canvas.BlitToPanels();
         }
+        if (effectCount > 0)
+        {
+            effectCount--;
+        }
+
     }
 }
 

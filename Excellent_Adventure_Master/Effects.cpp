@@ -251,7 +251,14 @@ int BlitzyIdle(Canvas *c, EffectManager *em, char mode)
 
 int RingFlash(Canvas *c, EffectManager *em, char mode)
 {
-    c->Clear(COLOR(31,31,31));
+    static bool bright = false;
+    if (bright)
+    {
+        c->Clear(COLOR(31,31,31));
+    } else {
+        c->Clear(0);
+    }
+    bright = !bright;
 /*
     for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
     {

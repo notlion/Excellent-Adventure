@@ -180,6 +180,7 @@ void loop()
     bool offHookRemote = SC.IsOffHookRemote();
     bool offHookLocal = SC.IsOffHookLocal();
     
+    //bool offHookLocal = time & 2048;
     // When low power mode is enabled, notify the EM.  When the EM is done
     // with its shutdown routine, then outright kill the power.
 
