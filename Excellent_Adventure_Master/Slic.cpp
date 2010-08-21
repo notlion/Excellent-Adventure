@@ -17,7 +17,7 @@ SLICControl :: SLICControl()
 
 }
 
-void SLICControl :: InitSLICPins()
+void SLICControl :: InitPins()
 {
     pinMode(SLIC_PIN_SWITCH_HOOK_L, INPUT); 
     pinMode(SLIC_PIN_SWITCH_HOOK_R, INPUT);
@@ -42,9 +42,11 @@ void SLICControl :: InitSLICPins()
 
 // Non-blocking 16-sample debouncing polling.  Returns true if the signal is
 // steady.
-unsigned long SLICControl :: Poll()
+void SLICControl :: Poll
+(
+    unsigned long                                   time
+)
 {
-    unsigned long time = millis();
     if ((time - m_time) > 2)
     {
         m_time = time;
@@ -99,7 +101,6 @@ unsigned long SLICControl :: Poll()
 
 
     //return false;
-    return m_time;
 }
 
 bool SLICControl :: IsOffHookLocal()

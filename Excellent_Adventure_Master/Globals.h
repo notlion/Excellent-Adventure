@@ -6,7 +6,7 @@
 #define USE_ARDUINO
 //#define USE_MAPLE
 
-#define USE_UART
+//#define USE_UART
 
 
 
@@ -22,7 +22,32 @@
 // software spectrum analysis.
 #define SPECTRUM_USE_HARDWARE
 
+// Blinks an LED on the Arduino to indicate operation
+#define BLINK_ENABLED
 
+// Define if this is the master booth
+#define BOOTH_MASTER
+
+// Minimum MS to wait before next frame of the effects:
+#define EFFECT_POLL_DELAY_MS    20
+#define BLINK_MS                1000
+
+// Seconds
+#define MAX_CALL_DURATION_SEC   (15*60)
+
+
+#define MAX_CALLEND_WAIT_MS     (2*1000)
+
+
+// DEFINES
+
+#define PM_LOW_POWER_MODE_ON    true
+#define PM_LOW_POWER_MODE_OFF   false
+#define PM_POWER_OFF            false
+#define PM_POWER_ON             true
+
+// When fading to black, how long to wait until we power down:
+#define EM_FADE_DELAY_MS        2000
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -70,11 +70,14 @@ class SLICControl
 public:
     SLICControl();
 
-    void InitSLICPins();
+    void InitPins();
 
     // Non-blocking poll.  Also handles the ringing when the ringing is
     // started.  Returns the milliseconds timestamp.
-    unsigned long Poll();
+    void Poll
+    (
+        unsigned long                               time
+    );
 
     bool IsOffHookLocal();
     bool IsOffHookRemote();

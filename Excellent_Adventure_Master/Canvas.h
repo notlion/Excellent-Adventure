@@ -139,7 +139,9 @@ typedef unsigned char       Channel_t;
 
 #define IS_BRIGHT(C)        (((C) >> BRIGHT_SHIFT)          & 0x1)
 
-
+// Color0 Color1, Weight, DENOM (as shift)
+#define CHANNEL_LINTERP_DENOM   5
+#define CHANNEL_LINTERP(C0,C1,W) ((int)((int)((int)(C1-C0)*W) >> CHANNEL_LINTERP_DENOM) + C0)
 
 class Canvas
 {
@@ -147,10 +149,11 @@ class Canvas
     // Internally we use a canvas with a height a power of 2
 
 #ifdef MEMORY_DYNAMIC
-    Color_t                                     *   m_canvas;
+    Color_t                                     *   m_canvas[2];
 #else
-    Color_t                                         m_canvas[CANVAS_MEMORY_SIZE];
+    Color_t                                         m_canvas[2][CANVAS_MEMORY_SIZE];
 #endif
+    char                                            m_who;
 public:
 
     Canvas();
@@ -160,11 +163,23 @@ public:
     // The firstID is the ID of the first pixel in the panels.
     void InitPanels();
     void BlitToPanels();
-
+    void BlitToPanelsInterpolate
+    (
+        bool                                        page,
+        char                                        weight
+    );
     void Clear
     (
         Color_t                                     color
             = 0
+    );
+
+    void FadeToBlack();
+
+    // The canvas has two memory pages.
+    void SetCanvasPage
+    (
+        char                                        who
     );
 
     void PutPixel
@@ -179,6 +194,8 @@ public:
         char                                        x,
         char                                        y
     );
+
+    
 
     Color_t * GetCanvas ();
 
