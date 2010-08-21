@@ -8,11 +8,13 @@
 #define EM_MODE_IDLE                0x00
 #define EM_MODE_RING                0x01
 
-// 0b 
+// 16 + submodes
 #define EM_MODE_CALL                0x10
 #define EM_MODE_CALLENDED           0x11
-#define EM_MODE_CALLENDED_FADE_END  0x12
-
+// Overtime: when someone has been on the line too long
+#define EM_MODE_CALL_OVERTIME       0x12
+#define EM_MODE_CALLENDED_FADE_END  0x13
+#define EM_MODE_CALLENDED_REBOOTED  0x14
 // 64 + submodes
 #define EM_MODE_DISABLE             0x40
 #define EM_MODE_DISABLE_FADE_END    0x41
@@ -52,6 +54,9 @@ class EffectManager
     Effect                                      *   m_effectsIdle;
     Effect                                      *   m_effectsRing;
     Effect                                      *   m_effectsCall;
+    Effect                                      *   m_effectsOver;
+
+    bool                                            m_rebooting;
 
     char                                            m_sizeIdle;
     char                                            m_currentIdle;
@@ -59,6 +64,9 @@ class EffectManager
     char                                            m_currentRing;
     char                                            m_sizeCall;
     char                                            m_currentCall;
+    char                                            m_sizeOver;
+    char                                            m_currentOver;
+
     char                                            m_mode;
     char                                            m_modePrevious;
     bool                                            m_disabled;
@@ -90,7 +98,9 @@ public:
         Effect                                  *   effectsRing,
         char                                        sizeRing,
         Effect                                  *   effectsCall,
-        char                                        sizeCall
+        char                                        sizeCall,
+        Effect                                  *   effectsOver,
+        char                                        sizeOver
     );
 
     void SetMode
@@ -102,9 +112,16 @@ public:
 
     void InstallAnimator();
     unsigned short * GetSpectrum();
+
+    // These two are power management calls, not to be used for rebooting
+    // panels.
     void EnableEffects();
     void DisableEffects();
     bool EffectsDisabled();
+
+    void RebootPanels();
+    bool RebootComplete();
+
     void Poll
     (
         unsigned long                               time,

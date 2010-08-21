@@ -6,7 +6,7 @@
 #define USE_ARDUINO
 //#define USE_MAPLE
 
-//#define USE_UART
+#define USE_UART
 
 
 
@@ -34,9 +34,9 @@
 
 // Seconds
 #define MAX_CALL_DURATION_SEC   (15*60)
+#define MAX_CALL_DURATION_MS    (MAX_CALL_DURATION_SEC*1000)
 
-
-#define MAX_CALLEND_WAIT_MS     (2*1000)
+#define CALLEND_WAIT_MS         3072
 
 
 // DEFINES

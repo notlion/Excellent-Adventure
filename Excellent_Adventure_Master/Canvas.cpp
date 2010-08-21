@@ -107,7 +107,17 @@ static char panelAddresses[] =
     82,     84,  85,    87,  88,    90,
     91,     93,  94,    96,  97,    99
 };
-    
+
+//     0       // Goes around the edge first
+//  3  4  1
+//     2
+
+static char ceilingAddresses[] = 
+{
+    1,  4,  5,  2,  3
+};
+
+
 // Minibooth:
 /*
 static char panelAddresses[] =
@@ -138,6 +148,7 @@ Canvas :: Canvas()
 {
     m_who = 0;
 #ifdef MEMORY_DYNAMIC    
+    m_ceiling = (Color_t *)malloc(sizeof(Color_t) * CEILING_LIGHTS);
     m_canvas[0] = (Color_t *)malloc(sizeof(Color_t) * CANVAS_MEMORY_SIZE);
     m_canvas[1] = (Color_t *)malloc(sizeof(Color_t) * CANVAS_MEMORY_SIZE);
 #endif
@@ -152,6 +163,7 @@ Canvas :: ~Canvas()
 void Canvas :: Destroy()
 {
 #ifdef MEMORY_DYNAMIC    
+    free(m_ceiling);
     free(m_canvas[0]);
     free(m_canvas[1]);
 #endif
@@ -319,9 +331,7 @@ void Canvas :: BlitToPanels()
     RGB[0] = 'c';
 #endif
     // Obtain the first address of our panels:
-    char *addr = &panelAddresses[0];
-
-    for (char y = 0; y < CANVAS_HEIGHT; y++)
+    for (char y = 0, *addr = &panelAddresses[0]; y < CANVAS_HEIGHT; y++)
     {
         //memory = (canvas + (y << widthShift));
         char x = 0;
@@ -357,6 +367,22 @@ void Canvas :: BlitToPanels()
             x++;
         }
     }
+    // Send out our ceiling data too:
+    
+    for (char n = 0, *addr = &ceilingAddresses[0]; n < CEILING_LIGHTS; n++, addr++)
+    {
+        Color_t color = m_ceiling[n];
+        RGB[1] = RED256_B(color);
+        RGB[2] = GREEN256_B(color);
+        RGB[3] = BLUE256_B(color);
+#ifdef USE_UART
+        RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
+        SERIAL_WRITE(RGB, 4);
+#else
+        I2C_WRITE((unsigned)(*addr), &RGB[0], 4);
+#endif
+    }
+
 #ifdef BENCHMARK    
     RGB[0] = 254;
     SERIAL_WRITE(RGB, 4);
@@ -369,23 +395,46 @@ void Canvas :: Clear
 )
 {
 #ifdef USE_ARDUINO    
-    memset(m_canvas, color, sizeof(Color_t)*CANVAS_MEMORY_SIZE);
+    memset(&m_canvas[m_who][0], color, sizeof(Color_t)*CANVAS_MEMORY_SIZE);
 #else
     // For some reason the Maple does not support this *fundamental* function,
     // or I can't find it.
-    Color_t *memory =       &m_canvas[0];
-    Color_t *canvasEnd =    &m_canvas[CANVAS_MEMORY_SIZE];
+    Color_t *memory =       &m_canvas[m_who][0];
+    Color_t *end =          &m_canvas[m_who][CANVAS_MEMORY_SIZE];
     do
     {
         *(memory++) = color;
-    } while (memory != canvasEnd);
+    } while (memory != end);
+
+#endif
+}
+
+void Canvas :: ClearCeiling
+(
+    Color_t                                         color
+)
+{
+#ifdef USE_ARDUINO    
+    memset(&m_ceiling[0], color, sizeof(Color_t)*CEILING_LIGHTS);
+#else
+    // For some reason the Maple does not support this *fundamental* function,
+    // or I can't find it.
+    Color_t *memory =       &m_ceiling[0];
+    Color_t *end =          &m_ceiling[CEILING_LIGHTS];
+    do
+    {
+        *(memory++) = color;
+    } while (memory != end);
 
 #endif
 }
 
 
+
 void Canvas :: FadeToBlack()
 {
+
+
     unsigned char data[4];
 
     // Stop all scripts
@@ -413,6 +462,24 @@ void Canvas :: SetCanvasPage
 {
     m_who = (who == 1) ? 1 : 0;
 }
+
+void Canvas :: PutPixelCeiling
+(
+    char                                            n,
+    Color_t                                         color
+)
+{
+    // Ex:
+    // width = 14, height = 12
+    // wS = 4
+    //
+    // x = 3, y = 7
+    // 7 << wS = 112 // 8th row of 16px wide
+    // 112 + 3 = 115 // 4th col of that row
+
+    m_ceiling[n] = color;
+}
+
 
 void Canvas :: PutPixel
 (
@@ -449,6 +516,14 @@ Color_t Canvas :: GetPixel
     return m_canvas[m_who][XY_TO_LINEAR(x,y)];
 }
 
+Color_t Canvas :: GetPixelCeiling
+(
+    char                                            n
+)
+{
+
+    return m_ceiling[n];
+}
 
 Color_t * Canvas :: GetCanvas()
 {

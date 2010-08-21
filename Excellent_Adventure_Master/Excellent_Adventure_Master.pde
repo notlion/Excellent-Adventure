@@ -91,6 +91,7 @@ SLICControl SC;
 #define EFFECTS_NUM_IDLE 1
 #define EFFECTS_NUM_RING 2
 #define EFFECTS_NUM_CALL 3
+#define EFFECTS_NUM_OVER 3
 
 Effect effectsIdle[EFFECTS_NUM_IDLE] =
 { 
@@ -120,6 +121,15 @@ Effect effectsCall[EFFECTS_NUM_CALL] =
 //,   {&SimpleColumns, 0}
 };
 
+Effect effectsOver[EFFECTS_NUM_OVER] =
+{ 
+    {&SimpleColumns, 0}
+,   {&CheckerBoard, 0}
+//    {&SimpleColumns, 0}
+,   {&Spotlight, 0}
+//,   {&SimpleColumns, 0}
+};
+
 
 void setup()
 {
@@ -133,9 +143,10 @@ void setup()
 
     EM.AddEffectsArrays
     (
-        effectsIdle, EFFECTS_NUM_IDLE, // Effects array, length
-        effectsRing, EFFECTS_NUM_RING, 
-        effectsCall, EFFECTS_NUM_CALL
+        effectsIdle,        EFFECTS_NUM_IDLE, // Effects array, length
+        effectsRing,        EFFECTS_NUM_RING, 
+        effectsCall,        EFFECTS_NUM_CALL,
+        effectsOver,        EFFECTS_NUM_OVER
     );
     EM.SetMode(EM_MODE_IDLE);
     EM.InitHardware();
@@ -171,11 +182,17 @@ void loop()
     
     // When low power mode is enabled, notify the EM.  When the EM is done
     // with its shutdown routine, then outright kill the power.
-    if (PM.Poll(time) == PM_LOW_POWER_MODE_ON)
+
+    // Poll whether the power management low power status has changed and act
+    // on it.
+    if (PM.Poll(time))
     {
-        EM.DisableEffects();
-    } else {
-        EM.EnableEffects();
+        if (PM.GetLowPowerStatus() == PM_LOW_POWER_MODE_ON)
+        {
+            EM.DisableEffects();
+        } else {
+            EM.EnableEffects();
+        }
     }
     EM.Poll(time, offHookLocal);
     PhoneControl(offHookLocal, offHookRemote);
@@ -197,26 +214,51 @@ void PhoneControl(bool offHookLocal, bool offHookRemote)
 #ifdef DEBUG
     if (debugState != state)
     {
-        debugState = state;
-        switch (state)
+        
+        switch (debugState)
         {
         case STATE_IDLE:
-            PRINTLN("State: IDLE");
+            PRINT("State: IDLE");
             break;
         case STATE_RING:
-            PRINTLN("State: RING");
+            PRINT("State: RING");
             break;
         case STATE_CALL:
-            PRINTLN("State: CALL");
+            PRINT("State: CALL");
             break;
         case STATE_CALLENDED:
-            PRINTLN("State: CALL ENDED");
+            PRINT("State: CALL ENDED");
+            break;
+        case -1:
+            PRINT("State: INIT");
             break;
         default:
             PRINT("State: UNKNOWN val = ");
-            PRINTLN(state);
+            PRINT((int)debugState);
             break;
         }
+
+        PRINT(" -> ");
+        switch (state)
+        {
+        case STATE_IDLE:
+            PRINTLN("IDLE");
+            break;
+        case STATE_RING:
+            PRINTLN("RING");
+            break;
+        case STATE_CALL:
+            PRINTLN("CALL");
+            break;
+        case STATE_CALLENDED:
+            PRINTLN("CALL ENDED");
+            break;
+        default:
+            PRINT("UNKNOWN val = ");
+            PRINTLN((int)state);
+            break;
+        }
+        debugState = state;
     }
 #endif
 
@@ -244,7 +286,7 @@ void PhoneControl(bool offHookLocal, bool offHookRemote)
             state = STATE_CALL;
             SC.StopRingingAll();
             // Start the call timer.
-            callEnded = false;
+            //callEnded = false;
         }
         else if (!offHookLocal && !offHookRemote)
         {
@@ -257,6 +299,13 @@ void PhoneControl(bool offHookLocal, bool offHookRemote)
 
         break;
     case STATE_CALL:
+        if (!offHookRemote && !offHookLocal)
+        {
+            // Both people hung up, end the call!
+            callEndTime = time;
+            state = STATE_CALLENDED;
+        } 
+        /*
         if (offHookLocal && offHookRemote)
         {
             // Call is in progress
@@ -268,15 +317,7 @@ void PhoneControl(bool offHookLocal, bool offHookRemote)
                 callEnded = false;
             }
         } 
-        else if (!offHookRemote && !offHookLocal)
-        {
-            // Both people hung up, return to idle.
-            callEnded = true;
-            // We use the same call time to delay the
-            // circuit reset.
-            callEndTime = time;
-            state = STATE_CALLENDED;
-        } else {
+        else else {
             // Someone hung up, but don't return to idle until the other
             // person did.
             //
@@ -292,9 +333,17 @@ void PhoneControl(bool offHookLocal, bool offHookRemote)
             // Audio.PlayDialTone();
         
         }
+        */
         break;
     case STATE_CALLENDED:
-        if ( (time - callEndTime) > MAX_CALLEND_WAIT_MS)
+        if (offHookRemote || offHookLocal)
+        {
+            // What? Someone picked up again?
+            state = STATE_CALL;
+            
+        }
+        // Wait a little before resetting
+        if ( (time - callEndTime) > CALLEND_WAIT_MS)
         {
             state = STATE_IDLE;
         }

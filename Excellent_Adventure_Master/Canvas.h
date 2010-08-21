@@ -51,6 +51,8 @@
 #define CANVAS_WIDTH        6
 #define CANVAS_HEIGHT       10
 
+#define CEILING_LIGHTS      5
+
 #define CANVAS_WM1          (CANVAS_WIDTH - 1)
 #define CANVAS_HM1          (CANVAS_HEIGHT - 1)
 
@@ -150,8 +152,10 @@ class Canvas
 
 #ifdef MEMORY_DYNAMIC
     Color_t                                     *   m_canvas[2];
+    Color_t                                     *   m_ceiling;
 #else
     Color_t                                         m_canvas[2][CANVAS_MEMORY_SIZE];
+    Color_t                                         m_ceiling[CEILING_LIGHTS];
 #endif
     char                                            m_who;
 public:
@@ -173,6 +177,11 @@ public:
         Color_t                                     color
             = 0
     );
+    void ClearCeiling
+    (
+        Color_t                                     color
+            = 0
+    );
 
     void FadeToBlack();
 
@@ -189,12 +198,23 @@ public:
         Color_t                                     color
     );
 
+    void PutPixelCeiling
+    (
+        char                                        n,
+        Color_t                                     color
+    );
+
+
     Color_t GetPixel
     (
         char                                        x,
         char                                        y
     );
 
+    Color_t GetPixelCeiling
+    (
+        char                                        n
+    );
     
 
     Color_t * GetCanvas ();

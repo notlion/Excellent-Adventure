@@ -265,4 +265,8 @@ int RingFlash(Canvas *c, EffectManager *em, char mode)
     return 1;
 }
 
-
+int Overtime (Canvas *c, EffectManager *em, char mode)
+{
+    c->Clear(0);
+    return 1;
+}

@@ -121,7 +121,6 @@ void SLICControl :: StartRingingLocal()
     m_ringModeLocal = RINGING_ON;
     m_isRingingLocal = RINGING_OFF;
     m_ringTimeDiffLocal = m_time & 0xFFFF;
-    // The edge SHOULD be false
     m_ringEdgeLocal = true;
     m_ringCountLocal = 0;
     digitalWrite (SLIC_PIN_RING_MODE_L, RING_MODE_PIN_ON);
