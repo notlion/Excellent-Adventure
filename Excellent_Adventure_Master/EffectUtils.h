@@ -1,6 +1,12 @@
-#define MOD32(C) ((C) & 31)
+#define MOD32(C)        ((C) & 31)
+
+#define MIN(V1, V2)     ((V1) < (V2) ? (V1) : (V2))
+#define MAX(V1, V2)     ((V1) > (V2) ? (V1) : (V2))
+
+#define LERP(V1, V2, U) ((V1) + ((V2) - (V1)) * (U))
 
 #define TWO_PI_TO_32 5.092958
+
 
 #include <math.h>
 #include <stdlib.h>
@@ -17,7 +23,6 @@ static uint8_t sin_lut[] =
 static Color_t colorwheel_lut[] =
 {
     0x801f, 0x80bf, 0x817f, 0x823f, 0x82ff, 0x83bf, 0x83fb, 0x83f5, 0x83ef, 0x83e9, 0x83e3, 0x87e0, 0x9fe0, 0xb7e0, 0xcfe0, 0xe7e0, 0xffe0, 0xff20, 0xfe60, 0xfda0, 0xfce0, 0xfc20, 0xfc03, 0xfc09, 0xfc0f, 0xfc15, 0xfc1b, 0xf41f, 0xdc1f, 0xc41f, 0xac1f, 0x941f
-    //0x801a, 0x809a, 0x813a, 0x81da, 0x827a, 0x831a, 0x8356, 0x8351, 0x834c, 0x8348, 0x8343, 0x8740, 0x9b40, 0xaf40, 0xc340, 0xd740, 0xeb40, 0xeaa0, 0xea00, 0xe960, 0xe8c0, 0xe820, 0xe803, 0xe808, 0xe80c, 0xe811, 0xe816, 0xe01a, 0xcc1a, 0xb81a, 0xa41a, 0x901a // low brightness
 };
 
 
@@ -29,18 +34,16 @@ float dist(float x1, float y1, float x2, float y2)
 }
 
 
-inline float max_f(float v1, float v2)
+Color_t lerpColor(Color_t c1, Color_t c2, float u)
 {
-    return v1 > v2 ? v1 : v2;
-}
-
-inline uint8_t min_ub(uint8_t v1, uint8_t v2)
-{
-    return v1 < v2 ? v1 : v2;
-}
-inline uint8_t max_ub(uint8_t v1, uint8_t v2)
-{
-    return v1 > v2 ? v1 : v2;
+    uint8_t r1 = RED(c1);
+    uint8_t g1 = GREEN(c1);
+    uint8_t b1 = BLUE(c1);
+    return COLOR_B(
+        (uint8_t)LERP(r1, RED(c2), u),
+        (uint8_t)LERP(g1, GREEN(c2), u),
+        (uint8_t)LERP(b1, BLUE(c2), u)
+    );
 }
 
 

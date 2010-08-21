@@ -89,6 +89,7 @@ int SimpleSpectrum(Canvas *c, EffectManager *em, char mode)
 
 int WarpSpectrum(Canvas *c, EffectManager *em, char mode)
 {
+    static uint8_t ci = 0;
     static unsigned short pos[CANVAS_WIDTH];
     //static          short vel[CANVAS_WIDTH];
     
@@ -98,8 +99,8 @@ int WarpSpectrum(Canvas *c, EffectManager *em, char mode)
             case EFFECTMODE_INTRO:
                 for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
                     pos[x] = CANVAS_HM1;
-                    // for(uint8_t y = 0; y < CANVAS_HEIGHT; y++)
-                    //     c->PutPixel(x, y, 0);
+                    for(uint8_t y = 0; y < CANVAS_HEIGHT; y++)
+                        c->PutPixel(x, y, 0);
                 }
                 break;
         }
@@ -108,6 +109,8 @@ int WarpSpectrum(Canvas *c, EffectManager *em, char mode)
     else{  // step
         unsigned short *spectrum = em->GetSpectrum();
         for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
+            if(spectrum[x] > 800)
+                ci = MOD32(ci + 1);
             pos[x] -= ((short)spectrum[x] - 150) * 10;
         }
     }
@@ -115,11 +118,41 @@ int WarpSpectrum(Canvas *c, EffectManager *em, char mode)
     for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
         uint8_t px = pos[x] / 6554;
         for(uint8_t y = 0; y < CANVAS_HEIGHT; y++){
-            c->PutPixel(x, y, y == px ? COLOR_B(0x1f,0,0) : COLOR_B(0,0,0));
+            if(y == px){  // shot of color
+                c->PutPixel(x, y, lerpColor(c->GetPixel(x, y), colorwheel_lut[ci], 0.5));
+            }
+            else if(y == px - 1 || y == px + 1){  // shot of color
+                c->PutPixel(x, y, lerpColor(c->GetPixel(x, y), colorwheel_lut[ci], 0.1));
+            }
+            else{  // fade out
+                Color_t px_color = c->GetPixel(x, y);
+                c->PutPixel(x, y, COLOR_B(
+                    MAX(0, char(RED(px_color)) - 2),
+                    MAX(0, char(GREEN(px_color)) - 2),
+                    MAX(0, char(BLUE(px_color)) - 2)
+                ));
+            }
         }
     }
     
     return 1;
+}
+
+int PinwheelSpectrum(Canvas *c, EffectManager *em, char mode)
+{
+    static int step = 0;
+    
+    static int ctrx = (CANVAS_WM1 * 100) / 2;
+    static int ctry = (CANVAS_HM1 * 100) / 2;
+    
+    for(char y = 0; y < CANVAS_HEIGHT; y++){
+        for(char x = 0; x < CANVAS_WIDTH; x++){
+            int angle = MOD32(int(atan2(y * 100 - ctry, x * 100 - ctrx) * TWO_PI_TO_32) + step);
+            c->PutPixel(x, y, colorwheel_lut[angle]);
+        }
+    }
+    
+    step += 2;
 }
 
 
@@ -204,10 +237,10 @@ int Spotlight(Canvas *c, EffectManager *em, char mode)
     uint8_t r, g, b;
     for(char y = 0; y < CANVAS_HEIGHT; y++){
         for(char x = 0; x < CANVAS_WIDTH; x++){
-            r = max_f(0.0f, 4.0f - dist(x, y, rlx, rly)) * 0x1F;
-            g = max_f(0.0f, 3.0f - dist(x, y, glx, gly)) * 0x1F;
-            b = max_f(0.0f, 4.0f - dist(x, y, blx, bly)) * 0x1F;
-            c->PutPixel(x, y, COLOR_B(min_ub(r, 0x1F), min_ub(g, 0x1f), min_ub(b, 0x1f)));
+            r = MAX(0.0f, 4.0f - dist(x, y, rlx, rly)) * 0x1F;
+            g = MAX(0.0f, 3.0f - dist(x, y, glx, gly)) * 0x1F;
+            b = MAX(0.0f, 4.0f - dist(x, y, blx, bly)) * 0x1F;
+            c->PutPixel(x, y, COLOR_B(MIN(r, 0x1F), MIN(g, 0x1f), MIN(b, 0x1f)));
         }
     }
     
