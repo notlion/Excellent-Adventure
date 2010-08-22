@@ -186,46 +186,46 @@ int PinwheelSpectrum(Canvas *c, EffectManager *em, char mode)
     step += 2;
 }
 
-int SolidDot(Canvas *c, EffectManager *em, char mode)
-{
-    static int step;
-    static Color_t color;
-    static unsigned short posx, posy;
-    
-    static char currentMode = -1;
-    if(mode != currentMode){  // performed only once
-        switch(mode){
-            case EFFECTMODE_INTRO:
-                step = 0;
-                
-                break;
-        }
-        currentMode = mode;
-    }
-    else{  // step
-        unsigned short *spectrum = em->GetSpectrum();
-        for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
-            short spc = spectrum[(x >> 1) + 3];
-            if(spc > 800)
-                ci = MOD32(ci + 1);
-            pos[x] -= (spc - 150) * 10;
-        }
-    }
-    
-    for(char x = 0; x < CANVAS_WIDTH; x += 2){
-        
-        for(char y = 0; y < CANVAS_HEIGHT; y++){
-            r = MAX(0.0f, 4.0f - dist(x, y, rlx, rly)) * 0x1F;
-            g = MAX(0.0f, 3.0f - dist(x, y, glx, gly)) * 0x1F;
-            b = MAX(0.0f, 4.0f - dist(x, y, blx, bly)) * 0x1F;
-            c->PutPixel(x, y, COLOR_B(MIN(r, 0x1F), MIN(g, 0x1f), MIN(b, 0x1f)));
-        }
-    }
-
-    step++;
-
-    return 1;
-}
+// int SolidDot(Canvas *c, EffectManager *em, char mode)
+// {
+//     static int step;
+//     static Color_t color;
+//     static unsigned short posx, posy;
+//     
+//     static char currentMode = -1;
+//     if(mode != currentMode){  // performed only once
+//         switch(mode){
+//             case EFFECTMODE_INTRO:
+//                 step = 0;
+//                 
+//                 break;
+//         }
+//         currentMode = mode;
+//     }
+//     else{  // step
+//         unsigned short *spectrum = em->GetSpectrum();
+//         for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
+//             short spc = spectrum[(x >> 1) + 3];
+//             if(spc > 800)
+//                 ci = MOD32(ci + 1);
+//             pos[x] -= (spc - 150) * 10;
+//         }
+//     }
+//     
+//     for(char x = 0; x < CANVAS_WIDTH; x += 2){
+//         
+//         for(char y = 0; y < CANVAS_HEIGHT; y++){
+//             r = MAX(0.0f, 4.0f - dist(x, y, rlx, rly)) * 0x1F;
+//             g = MAX(0.0f, 3.0f - dist(x, y, glx, gly)) * 0x1F;
+//             b = MAX(0.0f, 4.0f - dist(x, y, blx, bly)) * 0x1F;
+//             c->PutPixel(x, y, COLOR_B(MIN(r, 0x1F), MIN(g, 0x1f), MIN(b, 0x1f)));
+//         }
+//     }
+// 
+//     step++;
+// 
+//     return 1;
+// }
 
 
 int SimpleColumns(Canvas *c, EffectManager *em, char mode)
@@ -380,7 +380,19 @@ int CheckerBoard(Canvas *c, EffectManager *em, char mode)
 
 int BlitzyIdle(Canvas *c, EffectManager *em, char mode)
 {
+    static bool n = false;
+
+    n = !n;
     c->Clear(0);
+    c->ClearCeiling(COLOR_CEILING(192,0));
+    if (em->GetRandomNumber() > 0xC000)
+    {
+        c->PutPixelCeiling(1, 0);
+    }
+    if (em->GetRandomNumber() > 0xD000)
+    {
+        c->PutPixelCeiling(4, COLOR_CEILING(255,0));
+    }
     return 1;
 }
 
@@ -411,6 +423,7 @@ int RingFlash(Canvas *c, EffectManager *em, char mode)
 
 int Overtime(Canvas *c, EffectManager *em, char mode)
 {
+    c->ClearCeiling(COLOR_CEILING(0,255));
     c->Clear(0);
     return 1;
 }

@@ -87,7 +87,7 @@ SLICControl SC;
 #define EFFECTS_NUM_IDLE 1
 #define EFFECTS_NUM_RING 2
 #define EFFECTS_NUM_CALL 3
-#define EFFECTS_NUM_OVER 3
+#define EFFECTS_NUM_OVER 1
 
 Effect effectsIdle[EFFECTS_NUM_IDLE] =
 { 
@@ -119,10 +119,10 @@ Effect effectsCall[EFFECTS_NUM_CALL] =
 
 Effect effectsOver[EFFECTS_NUM_OVER] =
 { 
-    {&SimpleColumns, 0}
-,   {&CheckerBoard, 0}
+    {&Overtime, 0}
+//,   {&CheckerBoard, 0}
 //    {&SimpleColumns, 0}
-,   {&Spotlight, 0}
+//,   {&Spotlight, 0}
 //,   {&SimpleColumns, 0}
 };
 
@@ -157,7 +157,7 @@ void setup()
 
 #ifdef BLINK_ENABLED
     blinkMode = false;
-    pinMode(13, OUTPUT);
+    pinMode(BLINK_PIN, OUTPUT);
     blinkTime0 = time;
 #endif
     //EM.InstallAnimator();
@@ -198,7 +198,7 @@ void loop()
     {
         blinkTime0 = time;
         blinkMode = !blinkMode;
-        digitalWrite(13, blinkMode ? HIGH : LOW);
+        digitalWrite(BLINK_PIN, blinkMode ? HIGH : LOW);
     }    
 #endif
 }

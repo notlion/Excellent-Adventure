@@ -4,9 +4,6 @@
 
 
 
-#define DEBOUNCE_ALL_ONES           0xFFFF
-#define DEBOUNCE_ALL_ZEROS          0x0000
-#define DEBOUNCE_UNDEFINED          0xAAAA
 
 
 #define RINGING_ON                  true
@@ -47,8 +44,8 @@ class SLICControl
 
     bool                                            m_offHookLocal;
     bool                                            m_offHookRemote;
-    int                                             m_debounceLocal;
-    int                                             m_debounceRemote;
+    short                                           m_debounceLocal;
+    short                                           m_debounceRemote;
 
     unsigned long                                   m_time;
     bool                                            m_ringModeLocal;

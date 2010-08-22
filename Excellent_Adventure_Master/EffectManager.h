@@ -47,6 +47,8 @@ struct Effect
 };
 
 
+
+
 class EffectManager
 {
     Effect                                      *   m_effectsIdle;
@@ -64,6 +66,11 @@ class EffectManager
     char                                            m_currentCall;
     char                                            m_sizeOver;
     char                                            m_currentOver;
+
+    // m_disablePanels tells the system to disable the panels.
+    // m_panelsDisabled is the status
+    bool                                            m_disablePanels;
+    bool                                            m_panelsDisabled;
 
     char                                            m_mode;
     char                                            m_modePrevious;
@@ -124,8 +131,8 @@ public:
     (
         unsigned long                               time,
         bool                                        offHook
-        
     );
+    
 };
 
 //extern void ISRGlobal();
