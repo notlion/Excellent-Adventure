@@ -286,6 +286,7 @@ int RingFlash(Canvas *c, EffectManager *em, char mode)
 
 int Overtime (Canvas *c, EffectManager *em, char mode)
 {
+    c->ClearCeiling(COLOR_CEILING(0,255));
     c->Clear(0);
     return 1;
 }
