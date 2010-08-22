@@ -335,3 +335,41 @@ int CheckerBoard(Canvas *c, EffectManager *em, char mode)
     }
     return 1;
 }
+
+
+int BlitzyIdle(Canvas *c, EffectManager *em, char mode)
+{
+    c->Clear(0);
+    return 1;
+}
+
+
+int RingFlash(Canvas *c, EffectManager *em, char mode)
+{
+    static bool bright = false;
+    if (bright)
+    {
+        c->Clear(COLOR(31,31,31));
+    } else {
+        c->Clear(0);
+    }
+    bright = !bright;
+/*
+    for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
+    {
+        Color_t color = em->GetRandomNumber();//COLOR(r,g,b);
+        for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
+        {
+            c->PutPixel(x,y, color);
+        }
+    }
+*/
+    return 1;
+}
+
+
+int Overtime(Canvas *c, EffectManager *em, char mode)
+{
+    c->Clear(0);
+    return 1;
+}

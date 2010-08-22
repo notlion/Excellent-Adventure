@@ -1,9 +1,9 @@
 /*
-    ______ ______ __   __      __     __ ______ __  __ ______ __  __ ______
-   /\  ___\\  == \\ "-.\ \    /\ \  _ \ \\  == \\ \/ / \  ___\\ \_\ \\  == \
-   \ \ \____\  __< \ \-.  \   \ \ \/ ".\ \\  __< \  _"-.\___  \\  __ \\  _-/
-    \ \_____\\_____\\ \_\\"\   \ \ \__/".~\\ \_\ \\ \_\ \\_____\\_\ \_\\_\
-     \/_____//_____//_/ \/_/    \/_/   \/_//_/ /_//_/\/_//_____//_/\/_//_/
+   ______ ______ __   __      __     __ ______ __  __ ______ __  __ ______  
+  /\  ___\\  == \\ "-.\ \    /\ \  _ \ \\  == \\ \/ / \  ___\\ \_\ \\  == \ 
+  \ \ \____\  __< \ \-.  \   \ \ \/ ".\ \\  __< \  _"-.\___  \\  __ \\  _-/ 
+   \ \_____\\_____\\ \_\\"\   \ \ \__/".~\\ \_\ \\ \_\ \\_____\\_\ \_\\_\   
+    \/_____//_____//_/ \/_/    \/_/   \/_//_/ /_//_/\/_//_____//_/\/_//_/   
 
    ---What?---
    Combined "master" firmware for Excellent Adventure.
@@ -37,20 +37,10 @@
 #include "Slic.h"
 #include "Effects.h"
 
-// Blinks an LED on the Arduino to indicate operation
-#define BLINK_ENABLED
 
 //#define SERIAL_ENABLED
 
-// Define if this is the master booth
-#define BOOTH_MASTER
 
-// 
-#define POLLING_DELAY           1000
-
-#define PERIOD_MICROSEC         50000
-#define PANELS_WIDTH            9
-#define PANELS_HEIGHT           10
 
 #define STATE_IDLE              0
 #define STATE_RING              1
@@ -58,14 +48,9 @@
 #define STATE_CALLENDED         3
 #define STATE_BUSY              4
 
-#define PIN_SENSOR_LIGHT        0
 
-#define MAX_CALL_DURATION_MS    (15*60*1000)
 
-#define MAX_CALLEND_WAIT_MS     (2*1000)
 
-#define EFFECT_CALLBACK_MS      20
-#define BLINK_MS                1000
 
 //          +--------+   +--------+ 
 //  Tip ----| SLIC_L |   | SLIC_L |
@@ -82,9 +67,9 @@
 //          +---------------------+
 
 // L = Local; R = Remote
-
-unsigned int time0;
-unsigned long callTime;
+unsigned long time;
+unsigned long effectTime0;
+unsigned long callEndTime;
 
 unsigned int blinkTime0;
 bool blinkMode;
@@ -95,17 +80,50 @@ char state;
 char debugState;
 #endif
 
-EffectManager EM(PERIOD_MICROSEC);
+PowerManagement PM;
+EffectManager EM(&PM);
 SLICControl SC;
 
-Effect effects[] =
-{
-//    {&WarpSpectrum, 0}
-    {&ElevatorSpectrum, 0}
+#define EFFECTS_NUM_IDLE 1
+#define EFFECTS_NUM_RING 2
+#define EFFECTS_NUM_CALL 3
+#define EFFECTS_NUM_OVER 3
+
+Effect effectsIdle[EFFECTS_NUM_IDLE] =
+{ 
+    {&BlitzyIdle, 0}
+//    {&SimpleSpectrum, 0}
 //    {&CheckerBoard, 0}
 //    {&SimpleSpectrum, 0}
 //    {&Spotlight, 0}
 //    {&SimpleColumns, 0}
+};
+
+Effect effectsRing[EFFECTS_NUM_RING] =
+{ 
+    {&RingFlash, 0}
+//    {&CheckerBoard, 0}
+//    {&SimpleColumns, 0}
+,   {&Spotlight, 0}
+//,   {&SimpleColumns, 0}
+};
+
+Effect effectsCall[EFFECTS_NUM_CALL] =
+{ 
+    {&SimpleColumns, 0}
+,   {&CheckerBoard, 0}
+//    {&SimpleColumns, 0}
+,   {&Spotlight, 0}
+//,   {&SimpleColumns, 0}
+};
+
+Effect effectsOver[EFFECTS_NUM_OVER] =
+{ 
+    {&SimpleColumns, 0}
+,   {&CheckerBoard, 0}
+//    {&SimpleColumns, 0}
+,   {&Spotlight, 0}
+//,   {&SimpleColumns, 0}
 };
 
 
@@ -121,16 +139,17 @@ void setup()
 
     EM.AddEffectsArrays
     (
-        effects, 1, 
-        effects, 1, 
-        effects, 1
+        effectsIdle,        EFFECTS_NUM_IDLE, // Effects array, length
+        effectsRing,        EFFECTS_NUM_RING, 
+        effectsCall,        EFFECTS_NUM_CALL,
+        effectsOver,        EFFECTS_NUM_OVER
     );
     EM.SetMode(EM_MODE_IDLE);
     EM.InitHardware();
+    SC.InitPins();
+    PM.InitPins();
 
-    SC.InitSLICPins();
-
-    time0 = millis();
+    time = millis();
    
 #ifdef DEBUG
     debugState = -1;
@@ -139,7 +158,7 @@ void setup()
 #ifdef BLINK_ENABLED
     blinkMode = false;
     pinMode(13, OUTPUT);
-    blinkTime0 = time0;
+    blinkTime0 = time;
 #endif
     //EM.InstallAnimator();
 }
@@ -149,37 +168,94 @@ void setup()
 // -> Hang-up phone -> wait for other hang-up 
 
 
-
 void loop()
 {
+    time = millis();
+    SC.Poll(time);
     // PollOffHooks returns 
-    unsigned long time1 = SC.Poll();
     bool offHookRemote = SC.IsOffHookRemote();
     bool offHookLocal = SC.IsOffHookLocal();
+    
+    //bool offHookLocal = time & 2048;
+    // When low power mode is enabled, notify the EM.  When the EM is done
+    // with its shutdown routine, then outright kill the power.
+
+    // Poll whether the power management low power status has changed and act
+    // on it.
+    if (PM.Poll(time))
+    {
+        if (PM.GetLowPowerStatus() == PM_LOW_POWER_MODE_ON)
+        {
+            EM.DisableEffects();
+        } else {
+            EM.EnableEffects();
+        }
+    }
+    EM.Poll(time, offHookLocal);
+    PhoneControl(offHookLocal, offHookRemote);
+#ifdef BLINK_ENABLED
+    if ((time - blinkTime0) > BLINK_MS)
+    {
+        blinkTime0 = time;
+        blinkMode = !blinkMode;
+        digitalWrite(13, blinkMode ? HIGH : LOW);
+    }    
+#endif
+}
+
+
+void PhoneControl(bool offHookLocal, bool offHookRemote)
+{
+
 
 #ifdef DEBUG
     if (debugState != state)
     {
-        debugState = state;
-        switch (state)
+        
+        switch (debugState)
         {
         case STATE_IDLE:
-            PRINTLN("State: IDLE");
+            PRINT("State: IDLE");
             break;
         case STATE_RING:
-            PRINTLN("State: RING");
+            PRINT("State: RING");
             break;
         case STATE_CALL:
-            PRINTLN("State: CALL");
+            PRINT("State: CALL");
             break;
         case STATE_CALLENDED:
-            PRINTLN("State: CALL ENDED");
+            PRINT("State: CALL ENDED");
+            break;
+        case -1:
+            PRINT("State: INIT");
             break;
         default:
             PRINT("State: UNKNOWN val = ");
-            PRINTLN(state);
+            PRINT((int)debugState);
             break;
         }
+
+        PRINT(" -> ");
+        switch (state)
+        {
+        case STATE_IDLE:
+            PRINTLN("IDLE");
+            break;
+        case STATE_RING:
+            PRINTLN("RING");
+            break;
+        case STATE_CALL:
+            PRINTLN("CALL");
+            break;
+        case STATE_CALLENDED:
+            PRINTLN("CALL ENDED");
+            break;
+        default:
+            PRINT("UNKNOWN val = ");
+            PRINTLN((int)state);
+            break;
+        }
+        debugState = state;
     }
 #endif
 
@@ -188,6 +264,7 @@ void loop()
     case STATE_IDLE:
         if (offHookLocal || offHookRemote)
         {
+            // Wait until one of the phones is off the hook.
             // Audio.PlayDialTone();
             state = STATE_RING;
             if (offHookLocal)
@@ -206,9 +283,7 @@ void loop()
             state = STATE_CALL;
             SC.StopRingingAll();
             // Start the call timer.
-            callEnded = false;
-
-            callTime = time1;
+            //callEnded = false;
         }
         else if (!offHookLocal && !offHookRemote)
         {
@@ -221,6 +296,13 @@ void loop()
 
         break;
     case STATE_CALL:
+        if (!offHookRemote && !offHookLocal)
+        {
+            // Both people hung up, end the call!
+            callEndTime = time;
+            state = STATE_CALLENDED;
+        } 
+        /*
         if (offHookLocal && offHookRemote)
         {
             // Call is in progress
@@ -231,21 +313,8 @@ void loop()
                 //Audio.StopDialTone();
                 callEnded = false;
             }
-            if ((time1 - callTime) > MAX_CALL_DURATION_MS)
-            {
-                // Force a disconnection, i.e. cut the audio connection, and
-                // inject our own message.
-            }
         } 
-        else if (!offHookRemote && !offHookLocal)
-        {
-            // Both people hung up, return to idle.
-            callEnded = true;
-            callTime = time1; 
-            // We use the same call time to delay the
-            // circuit reset.
-            state = STATE_CALLENDED;
-        } else {
+        else else {
             // Someone hung up, but don't return to idle until the other
             // person did.
             //
@@ -261,9 +330,17 @@ void loop()
             // Audio.PlayDialTone();
         
         }
+        */
         break;
     case STATE_CALLENDED:
-        if ( (time1 - callTime) > MAX_CALLEND_WAIT_MS)
+        if (offHookRemote || offHookLocal)
+        {
+            // What? Someone picked up again?
+            state = STATE_CALL;
+            
+        }
+        // Wait a little before resetting
+        if ( (time - callEndTime) > CALLEND_WAIT_MS)
         {
             state = STATE_IDLE;
         }
@@ -273,18 +350,4 @@ void loop()
         break;
 
     };
-    if ((time1 - time0) > EFFECT_CALLBACK_MS)
-    {
-        time0 = time1;
-        EM.Callback();
-    }    
-#ifdef BLINK_ENABLED
-    if ((time1 - blinkTime0) > BLINK_MS)
-    {
-        blinkTime0 = time1;
-        blinkMode = !blinkMode;
-        digitalWrite(13, blinkMode ? HIGH : LOW);
-    }    
-#endif
-    //delay(POLLING_DELAY);
 }

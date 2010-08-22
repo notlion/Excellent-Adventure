@@ -49,8 +49,8 @@
 #ifdef USE_ARDUINO
 #include <Wire.h>
 
-#define BLINKM_PLUGGED_INTO_ARDUINO
-#define SERIAL  (Serial)
+//#define BLINKM_PLUGGED_INTO_ARDUINO
+//#define SERIAL  (Serial)
 
 #define I2C_INIT(RATE)                                                      \
     Wire.begin()
@@ -107,7 +107,34 @@ static char panelAddresses[] =
     82,    84,  85,    87,  88,    90,
     91,    93,  94,    96,  97,    99
 };
-    
+
+//     0       // Goes around the edge first
+//  3  4  1
+//     2
+
+static char ceilingAddresses[] = 
+{
+    1,  4,  5,  2,  3
+};
+
+
+// Minibooth:
+/*
+static char panelAddresses[] =
+{
+    1, 2, 3, 4, 5, 6,
+    7, 8, 9, 10, 11, 12,
+    13, 14, 15, 16, 17, 18,
+    -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1
+};
+*/
+
 
 
 /*
@@ -119,8 +146,11 @@ extern "C"
 
 Canvas :: Canvas()
 {
+    m_who = 0;
 #ifdef MEMORY_DYNAMIC    
-    m_canvas = (Color_t *)malloc(sizeof(Color_t) * CANVAS_MEMORY_SIZE);
+    m_ceiling = (Color_t *)malloc(sizeof(Color_t) * CEILING_LIGHTS);
+    m_canvas[0] = (Color_t *)malloc(sizeof(Color_t) * CANVAS_MEMORY_SIZE);
+    m_canvas[1] = (Color_t *)malloc(sizeof(Color_t) * CANVAS_MEMORY_SIZE);
 #endif
     Clear();
 }
@@ -133,7 +163,9 @@ Canvas :: ~Canvas()
 void Canvas :: Destroy()
 {
 #ifdef MEMORY_DYNAMIC    
-    free(m_canvas);
+    free(m_ceiling);
+    free(m_canvas[0]);
+    free(m_canvas[1]);
 #endif
 }
 
@@ -153,16 +185,16 @@ void Canvas :: InitPanels ()
 #endif
 
     I2C_INIT(I2C_RATE);
-
+    FadeToBlack();
+    /*
     unsigned char data[4];
-
     // Stop all scripts
     data[0] = 'o';
     I2C_WRITE(ADDR_ALL_PIXELS, data, 1);
 
     // Set fade speed
     data[0] = 'f';
-    data[1] = 50;
+    data[1] = 192;
     I2C_WRITE(ADDR_ALL_PIXELS, data, 2);
 
     // Fade to black
@@ -171,17 +203,22 @@ void Canvas :: InitPanels ()
     data[2] = 0;
     data[3] = 0;
     I2C_WRITE(ADDR_ALL_PIXELS, data, 4);
+    */
 }
 
-void Canvas :: BlitToPanels()
+void Canvas :: BlitToPanelsInterpolate
+(
+    bool                                            page,
+    char                                            weight
+)
 {
-    static Channel_t RGB[4];
-
-
+    Channel_t RGB[4];
+    char who0 = page ? 0 : 1;
+    char who1 = page ? 1 : 0;
 
 #ifdef BENCHMARK    
     RGB[3] = 253;
-    SERIAL.write(RGB, 4);
+    SERIAL_WRITE(RGB, 4);
 #endif
 
 #ifdef USE_UART
@@ -192,10 +229,11 @@ void Canvas :: BlitToPanels()
 #else
     // Sets the color immediately ('n')
     // Fade to color ('c')
+
+    RGB[0] = 'o';
+    I2C_WRITE(ADDR_ALL_PIXELS, RGB, 1);
     RGB[0] = 'c';
 #endif
-
-
     // Obtain the first address of our panels:
     char *addr = &panelAddresses[0];
 
@@ -208,24 +246,50 @@ void Canvas :: BlitToPanels()
             // We skip any addresses that are < 0, saving processing.
             if (*addr >= 0)
             {
-
+                SetCanvasPage(who0);
                 Color_t color = GetPixel(x, y);
+
+                Channel_t r0, r1, g0, g1, b0, b1;
+                
                 if (IS_BRIGHT(color))
                 {
                     // Set color immediately:
-                    RGB[1] = RED256_B(color);
-                    RGB[2] = GREEN256_B(color);
-                    RGB[3] = BLUE256_B(color);
+                    r0 = RED256_B(color);
+                    g0 = GREEN256_B(color);
+                    b0 = BLUE256_B(color);
                     
                 } else {
-                    RGB[1] = RED256(color);
-                    RGB[2] = GREEN256(color);
-                    RGB[3] = BLUE256(color);
+                    r0 = RED256(color);
+                    g0 = GREEN256(color);
+                    b0 = BLUE256(color);
                 }
+
+                SetCanvasPage(who1);
+                color = GetPixel(x, y);
+
+                if (IS_BRIGHT(color))
+                {
+                    // Set color immediately:
+                    r1 = RED256_B(color);
+                    g1 = GREEN256_B(color);
+                    b1 = BLUE256_B(color);
+                    
+                } else {
+                    r1 = RED256(color);
+                    g1 = GREEN256(color);
+                    b1 = BLUE256(color);
+                }
+
+                RGB[1] = (Channel_t)(CHANNEL_LINTERP(r1,r0,weight) && 0xFF);
+                RGB[2] = (Channel_t)(CHANNEL_LINTERP(g1,g0,weight) && 0xFF);
+                RGB[3] = (Channel_t)(CHANNEL_LINTERP(b1,b0,weight) && 0xFF);
+                
+
 #ifdef USE_UART
                 RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
                 SERIAL_WRITE(RGB, 4);
 #else
+                
                 I2C_WRITE((unsigned)(*addr), &RGB[0], 4);
 #endif
 
@@ -238,6 +302,91 @@ void Canvas :: BlitToPanels()
     RGB[0] = 254;
     SERIAL_WRITE(RGB, 4);
 #endif
+
+}
+
+
+
+void Canvas :: BlitToPanels()
+{
+    Channel_t RGB[4];
+#ifdef BENCHMARK    
+    RGB[3] = 253;
+    SERIAL_WRITE(RGB, 4);
+#endif
+
+#ifdef USE_UART
+    // This is a sync frame:
+
+    RGB[0] = RGB[1] = RGB[2] = RGB[3] = 0xFF;
+    SERIAL_WRITE(RGB, 4);
+#else
+    // Sets the color immediately ('n')
+    // Fade to color ('c')
+
+    RGB[0] = 'o';
+    I2C_WRITE(ADDR_ALL_PIXELS, RGB, 1);
+
+
+    RGB[0] = 'c';
+#endif
+    // Obtain the first address of our panels:
+    for (char y = 0, *addr = &panelAddresses[0]; y < CANVAS_HEIGHT; y++)
+    {
+        //memory = (canvas + (y << widthShift));
+        char x = 0;
+        while (x < CANVAS_WIDTH)
+        {
+            // We skip any addresses that are < 0, saving processing.
+            if (*addr >= 0)
+            {
+
+                Color_t color = GetPixel(x, y);
+                //if (IS_BRIGHT(color))
+                //{
+                    // Set color immediately:
+                    RGB[1] = RED256_B(color);
+                    RGB[2] = GREEN256_B(color);
+                    RGB[3] = BLUE256_B(color);
+                    
+                //} else {
+                //    RGB[1] = RED256(color);
+                //    RGB[2] = GREEN256(color);
+                //    RGB[3] = BLUE256(color);
+                //}
+#ifdef USE_UART
+                RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
+                SERIAL_WRITE(RGB, 4);
+#else
+                
+                I2C_WRITE((unsigned)(*addr), &RGB[0], 4);
+#endif
+
+            }
+            addr++;
+            x++;
+        }
+    }
+    // Send out our ceiling data too:
+    
+    for (char n = 0, *addr = &ceilingAddresses[0]; n < CEILING_LIGHTS; n++, addr++)
+    {
+        Color_t color = m_ceiling[n];
+        RGB[1] = RED256_B(color);
+        RGB[2] = GREEN256_B(color);
+        RGB[3] = BLUE256_B(color);
+#ifdef USE_UART
+        RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
+        SERIAL_WRITE(RGB, 4);
+#else
+        I2C_WRITE((unsigned)(*addr), &RGB[0], 4);
+#endif
+    }
+
+#ifdef BENCHMARK    
+    RGB[0] = 254;
+    SERIAL_WRITE(RGB, 4);
+#endif
 }
 
 void Canvas :: Clear
@@ -246,19 +395,91 @@ void Canvas :: Clear
 )
 {
 #ifdef USE_ARDUINO    
-    memset(m_canvas, color, sizeof(Color_t)*CANVAS_MEMORY_SIZE);
+    memset(&m_canvas[m_who][0], color, sizeof(Color_t)*CANVAS_MEMORY_SIZE);
 #else
     // For some reason the Maple does not support this *fundamental* function,
     // or I can't find it.
-    Color_t *memory =       &m_canvas[0];
-    Color_t *canvasEnd =    &m_canvas[CANVAS_MEMORY_SIZE];
+    Color_t *memory =       &m_canvas[m_who][0];
+    Color_t *end =          &m_canvas[m_who][CANVAS_MEMORY_SIZE];
     do
     {
         *(memory++) = color;
-    } while (memory != canvasEnd);
+    } while (memory != end);
 
 #endif
 }
+
+void Canvas :: ClearCeiling
+(
+    Color_t                                         color
+)
+{
+#ifdef USE_ARDUINO    
+    memset(&m_ceiling[0], color, sizeof(Color_t)*CEILING_LIGHTS);
+#else
+    // For some reason the Maple does not support this *fundamental* function,
+    // or I can't find it.
+    Color_t *memory =       &m_ceiling[0];
+    Color_t *end =          &m_ceiling[CEILING_LIGHTS];
+    do
+    {
+        *(memory++) = color;
+    } while (memory != end);
+
+#endif
+}
+
+
+
+void Canvas :: FadeToBlack()
+{
+
+
+    unsigned char data[4];
+
+    // Stop all scripts
+    data[0] = 'o';
+    I2C_WRITE(ADDR_ALL_PIXELS, data, 1);
+
+    // Set fade speed
+    data[0] = 'f';
+    data[1] = 16;
+    I2C_WRITE(ADDR_ALL_PIXELS, data, 2);
+
+    // Fade to black
+    data[0] = 'c';
+    data[1] = 0;
+    data[2] = 0;
+    data[3] = 0;
+    I2C_WRITE(ADDR_ALL_PIXELS, data, 4);
+}
+
+
+void Canvas :: SetCanvasPage
+(
+    char                                            who
+)
+{
+    m_who = (who == 1) ? 1 : 0;
+}
+
+void Canvas :: PutPixelCeiling
+(
+    char                                            n,
+    Color_t                                         color
+)
+{
+    // Ex:
+    // width = 14, height = 12
+    // wS = 4
+    //
+    // x = 3, y = 7
+    // 7 << wS = 112 // 8th row of 16px wide
+    // 112 + 3 = 115 // 4th col of that row
+
+    m_ceiling[n] = color;
+}
+
 
 void Canvas :: PutPixel
 (
@@ -275,7 +496,7 @@ void Canvas :: PutPixel
     // 7 << wS = 112 // 8th row of 16px wide
     // 112 + 3 = 115 // 4th col of that row
 
-    m_canvas[XY_TO_LINEAR(x,y)] = color;
+    m_canvas[m_who][XY_TO_LINEAR(x,y)] = color;
 }
 
 Color_t Canvas :: GetPixel
@@ -292,13 +513,21 @@ Color_t Canvas :: GetPixel
     // 7 << wS = 112 // 8th row of 16px wide
     // 112 + 3 = 115 // 4th col of that row
 
-    return m_canvas[XY_TO_LINEAR(x,y)];
+    return m_canvas[m_who][XY_TO_LINEAR(x,y)];
 }
 
-
-inline Color_t * Canvas :: GetCanvas()
+Color_t Canvas :: GetPixelCeiling
+(
+    char                                            n
+)
 {
-    return m_canvas;
+
+    return m_ceiling[n];
+}
+
+Color_t * Canvas :: GetCanvas()
+{
+    return &m_canvas[m_who][0];
 }
 
 

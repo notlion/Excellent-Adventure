@@ -51,6 +51,8 @@
 #define CANVAS_WIDTH        6
 #define CANVAS_HEIGHT       10
 
+#define CEILING_LIGHTS      5
+
 #define CANVAS_WM1          (CANVAS_WIDTH - 1)
 #define CANVAS_HM1          (CANVAS_HEIGHT - 1)
 
@@ -139,7 +141,9 @@ typedef unsigned char       Channel_t;
                                                       
 #define IS_BRIGHT(C)    (((C) >> BRIGHT_SHIFT)        & 0x1)
 
-
+// Color0 Color1, Weight, DENOM (as shift)
+#define CHANNEL_LINTERP_DENOM   5
+#define CHANNEL_LINTERP(C0,C1,W) ((int)((int)((int)(C1-C0)*W) >> CHANNEL_LINTERP_DENOM) + C0)
 
 class Canvas
 {
@@ -147,10 +151,13 @@ class Canvas
     // Internally we use a canvas with a height a power of 2
 
 #ifdef MEMORY_DYNAMIC
-    Color_t                                     *   m_canvas;
+    Color_t                                     *   m_canvas[2];
+    Color_t                                     *   m_ceiling;
 #else
-    Color_t                                         m_canvas[CANVAS_MEMORY_SIZE];
+    Color_t                                         m_canvas[2][CANVAS_MEMORY_SIZE];
+    Color_t                                         m_ceiling[CEILING_LIGHTS];
 #endif
+    char                                            m_who;
 public:
 
     Canvas();
@@ -160,11 +167,28 @@ public:
     // The firstID is the ID of the first pixel in the panels.
     void InitPanels();
     void BlitToPanels();
-
+    void BlitToPanelsInterpolate
+    (
+        bool                                        page,
+        char                                        weight
+    );
     void Clear
     (
         Color_t                                     color
             = 0
+    );
+    void ClearCeiling
+    (
+        Color_t                                     color
+            = 0
+    );
+
+    void FadeToBlack();
+
+    // The canvas has two memory pages.
+    void SetCanvasPage
+    (
+        char                                        who
     );
 
     void PutPixel
@@ -174,11 +198,24 @@ public:
         Color_t                                     color
     );
 
+    void PutPixelCeiling
+    (
+        char                                        n,
+        Color_t                                     color
+    );
+
+
     Color_t GetPixel
     (
         char                                        x,
         char                                        y
     );
+
+    Color_t GetPixelCeiling
+    (
+        char                                        n
+    );
+    
 
     Color_t * GetCanvas ();
 
