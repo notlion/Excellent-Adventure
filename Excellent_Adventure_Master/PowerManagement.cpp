@@ -51,6 +51,9 @@ void PowerManagement :: PowerDown()
     m_ready = false;
 }
 
+// The poll function checks the value of the light sensor.  The signal is
+// debounced over a period of 16 * polling period -- about 16 seconds -- and
+// has a threshold as well.
 bool PowerManagement :: Poll
 (
     unsigned long                                   time

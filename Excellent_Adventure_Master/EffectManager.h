@@ -67,6 +67,11 @@ class EffectManager
     char                                            m_sizeOver;
     char                                            m_currentOver;
 
+    // m_disablePanels tells the system to disable the panels.
+    // m_panelsDisabled is the status
+    bool                                            m_disablePanels;
+    bool                                            m_panelsDisabled;
+
     char                                            m_mode;
     char                                            m_modePrevious;
     bool                                            m_disabled;

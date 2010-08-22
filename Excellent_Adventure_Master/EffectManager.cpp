@@ -100,22 +100,12 @@ void EffectManager :: SetMode
 
 void EffectManager :: EnableEffects()
 {
-    if (m_pm->GetPowerStatus() == PM_POWER_OFF)
-    {
-        m_pm->PowerUp();
-        // Idea: wait another bit before switching mode?
-        m_mode = EM_MODE_IDLE;
-        m_pollDelay += EM_FADE_DELAY_MS;
-    }
-
+    m_disablePanels = false;
 }
 
 void EffectManager :: DisableEffects()
 {
-    if (m_mode & EM_MODE_DISABLE) // Covers all the disable modes
-    {
-        m_mode = EM_MODE_DISABLE;
-    }
+    m_disablePanels = true;
 }
 
 bool EffectManager :: EffectsDisabled()
@@ -196,6 +186,11 @@ void EffectManager :: Poll
         case EM_MODE_IDLE:
         case EM_MODE_RING:
         default:
+            if (m_disablePanels)
+            {
+                m_mode = EM_MODE_DISABLE;
+                m_panelsDisabled = false;
+            }
             if
             (
                 digitalRead(PHONE_PIN_RING_DETECT)
@@ -262,8 +257,16 @@ void EffectManager :: Poll
             }
             break;
         case EM_MODE_DISABLE_STANDBY:
+            if (m_disablePanels == false)
+            {
+                m_panelsDisabled = false;
+                RebootPanels();
+                m_mode = EM_MODE_CALLENDED_REBOOTED;
+            }
+            
             // Do nothing.
             m_pollDelay += EM_FADE_DELAY_MS; // To reduce poll time.
+
             break;
         }
 
