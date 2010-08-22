@@ -19,5 +19,9 @@ int BlitzyIdle       (Canvas *c, EffectManager *em, char mode);
 int Overtime(Canvas *c, EffectManager *em, char mode);
 
 
+// Ideas
+// Single Color Pulsing with Single Pixel
+// Pulsing Spotlight on Phone
+
 
 #endif
