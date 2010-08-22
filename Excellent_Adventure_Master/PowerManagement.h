@@ -4,7 +4,12 @@
 
 class PowerManagement
 {
-    bool                                            m_status;
+    bool                                            m_powerStatus;
+    bool                                            m_lowPowerStatus;
+    bool                                            m_lowPowerStatusOld;
+    short                                           m_debounce;
+    unsigned long                                   m_time;
+    bool                                            m_ready;
 public:
     PowerManagement();
     ~PowerManagement();

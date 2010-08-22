@@ -15,6 +15,15 @@
 
 #define SPECTRUM_REDUCTION_FACTOR       1
 
+
+#define LIGHT_SENSOR_THRESHOLD  512
+#define LIGHT_SENSOR_POLLING_MS 1024
+
+#define DEBOUNCE_ALL_ONES           0xFFFF
+#define DEBOUNCE_ALL_ZEROS          0x0000
+#define DEBOUNCE_UNDEFINED          0xAAAA
+
+
 //#define MEMORY_DYNAMIC
 //#define BENCHMARK
 
@@ -23,7 +32,7 @@
 #define SPECTRUM_USE_HARDWARE
 
 // Blinks an LED on the Arduino to indicate operation
-#define BLINK_ENABLED
+//#define BLINK_ENABLED
 
 // Define if this is the master booth
 #define BOOTH_MASTER
@@ -73,6 +82,9 @@
 
 #define SPECTRUM_PIN_STROBE     2
 #define SPECTRUM_PIN_RESET      3
+
+#define BLINK_PIN               13
+
 
 // ANALOG 0 = Pin 14
 #define SPECTRUM_PIN_ANALOG     0
@@ -126,6 +138,9 @@
 
 #define SPECTRUM_PIN_STROBE     2
 #define SPECTRUM_PIN_RESET      3
+
+#define BLINK_PIN               13
+
 
 // ANALOG 0 = Pin 14
 #define SPECTRUM_PIN_ANALOG     0

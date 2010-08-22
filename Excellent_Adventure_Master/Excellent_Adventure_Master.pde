@@ -161,7 +161,7 @@ void setup()
 
 #ifdef BLINK_ENABLED
     blinkMode = false;
-    pinMode(13, OUTPUT);
+    pinMode(BLINK_PIN, OUTPUT);
     blinkTime0 = time;
 #endif
     //EM.InstallAnimator();
@@ -202,7 +202,7 @@ void loop()
     {
         blinkTime0 = time;
         blinkMode = !blinkMode;
-        digitalWrite(13, blinkMode ? HIGH : LOW);
+        digitalWrite(BLINK_PIN, blinkMode ? HIGH : LOW);
     }    
 #endif
 }
