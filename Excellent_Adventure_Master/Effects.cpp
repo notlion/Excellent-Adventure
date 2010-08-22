@@ -244,7 +244,19 @@ int CheckerBoard(Canvas *c, EffectManager *em, char mode)
 
 int BlitzyIdle(Canvas *c, EffectManager *em, char mode)
 {
+    static bool n = false;
+
+    n = !n;
     c->Clear(0);
+    c->ClearCeiling(COLOR_CEILING(192,0));
+    if (em->GetRandomNumber() > 0xC000)
+    {
+        c->PutPixelCeiling(1, 0);
+    }
+    if (em->GetRandomNumber() > 0xD000)
+    {
+        c->PutPixelCeiling(4, COLOR_CEILING(255,0));
+    }
     return 1;
 }
 

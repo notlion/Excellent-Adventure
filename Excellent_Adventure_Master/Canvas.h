@@ -68,6 +68,7 @@
 #define ADDR_ALL_PIXELS     0
 
 // We use 16-bit color for now
+typedef unsigned short      ColorCeiling_t;
 typedef unsigned short      Color_t;
 typedef unsigned char       Channel_t;
 
@@ -76,6 +77,9 @@ typedef unsigned char       Channel_t;
 #define G_SHIFT             CHANNEL_BITS
 #define B_SHIFT             (2*CHANNEL_BITS)
 #define BRIGHT_SHIFT        (3*CHANNEL_BITS)
+
+#define WHITE_SHIFT         0
+#define UV_SHIFT            8
 
 // 0b11111000 --> 0xF8
 #define BRIGHT_MASK         0xF8
@@ -88,7 +92,6 @@ typedef unsigned char       Channel_t;
 #define BRIGHT_SCALE        (-3)
 
 
-// Assumes [0, 255]
 // Yes, the compiler IS stupid enough to not properly perform shifts without
 // corrupting the upper bytes.
 //#define COLOR(R,G,B)    (uint32_t)(((uint32_t)(B) << 16) | ((uint32_t)(G) << 8) | (uint32_t)(R))
@@ -96,13 +99,19 @@ typedef unsigned char       Channel_t;
 // Broken:
 // #define COLOR(R,G,B)    (uint32_t)(((B) << 16) | ((G) << 8) | (R))
 
-//Produce a byte-packed 15-bit color.  Channels are from [0:31]
+//Produce a byte-packed 15-bit color.  Channels are from [0,31]
 #define COLOR(R,G,B)        (Color_t)(      ((B) << B_SHIFT)                \
                                         |   ((G) << G_SHIFT)                \
                                         |   ((R) << R_SHIFT))
 
 
 #define COLOR_B(R,G,B)      (Color_t)((1 << BRIGHT_SHIFT) | COLOR(R,G,B))
+
+// Colors in the ceiling are [0, 255] not [0,31]
+
+#define COLOR_CEILING(W,U)  (ColorCeiling_t)(      ((W) << WHITE_SHIFT)     \
+                                               |   ((U) << UV_SHIFT))
+
 
 // The bright bit is bit-16
 #define SETBRIGHT(C)        ((C) |= (1 << BRIGHT_SHIFT))
@@ -132,6 +141,9 @@ typedef unsigned char       Channel_t;
 #define RED256_B(C)     (Channel_t)(((C) << 3)       & BRIGHT_MASK)
 #define GREEN256_B(C)   (Channel_t)(((C) >> 2)       & BRIGHT_MASK)
 #define BLUE256_B(C)    (Channel_t)(((C) >> 7)       & BRIGHT_MASK)
+
+#define CEILING_WHITE(C) (Channel_t)((C)            & CHANNEL_MASK)
+#define CEILING_UV(C)    (Channel_t)(((C) >> 8)     & CHANNEL_MASK)
 
 // Raw 5-bit values
 
@@ -201,7 +213,7 @@ public:
     void PutPixelCeiling
     (
         char                                        n,
-        Color_t                                     color
+        ColorCeiling_t                              color
     );
 
 
@@ -211,7 +223,7 @@ public:
         char                                        y
     );
 
-    Color_t GetPixelCeiling
+    ColorCeiling_t GetPixelCeiling
     (
         char                                        n
     );

@@ -372,9 +372,9 @@ void Canvas :: BlitToPanels()
     for (char n = 0, *addr = &ceilingAddresses[0]; n < CEILING_LIGHTS; n++, addr++)
     {
         Color_t color = m_ceiling[n];
-        RGB[1] = RED256_B(color);
-        RGB[2] = GREEN256_B(color);
-        RGB[3] = BLUE256_B(color);
+        RGB[1] = CEILING_WHITE(color);
+        RGB[2] = CEILING_UV(color);
+        RGB[3] = 0;
 #ifdef USE_UART
         RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
         SERIAL_WRITE(RGB, 4);
@@ -466,7 +466,7 @@ void Canvas :: SetCanvasPage
 void Canvas :: PutPixelCeiling
 (
     char                                            n,
-    Color_t                                         color
+    ColorCeiling_t                                  color
 )
 {
     // Ex:
@@ -516,7 +516,7 @@ Color_t Canvas :: GetPixel
     return m_canvas[m_who][XY_TO_LINEAR(x,y)];
 }
 
-Color_t Canvas :: GetPixelCeiling
+ColorCeiling_t Canvas :: GetPixelCeiling
 (
     char                                            n
 )
