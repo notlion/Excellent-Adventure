@@ -27,6 +27,7 @@ EffectManager :: EffectManager
     PowerManagement                             *   pm
 )
 {
+    m_laserOn = false;
     m_pm = pm;
     m_modePrevious = -1;
     m_currentIdle = 0;
@@ -77,6 +78,23 @@ void EffectManager :: InitSpectrum()
     m_spectrum.InitSpectrumPins();
 }
 
+void EffectManager :: PulseLaser()
+{
+    if (m_pm->GetLowPowerStatus() == PM_LOW_POWER_MODE_OFF)
+    {
+        m_laserOn = true;
+        digitalWrite(BOOTH_PIN_LASER, HIGH);
+    }
+}
+
+void EffectManager :: LaserOff()
+{
+    if (m_laserOn)
+    {
+        m_laserOn = false;
+        digitalWrite(BOOTH_PIN_LASER, LOW);
+    }
+}
 
 
 void EffectManager :: AddEffectsArrays
@@ -187,6 +205,10 @@ void EffectManager :: Poll
 
     if ((time - m_pollDelay) > EFFECT_POLL_DELAY_MS)
     {
+        LaserOff();
+
+        static bool laserMode = false;
+        
         //EM_DEBUG("BEGIN POLL");
         //EM_DEBUG(effectCount);
         //static int ringer = 0;
@@ -201,8 +223,8 @@ void EffectManager :: Poll
         static Effect * effects;
         switch (m_mode)
         {
-        case EM_MODE_IDLE:
         case EM_MODE_RING:
+        case EM_MODE_IDLE:
         default:
             if (m_disablePanels)
             {
@@ -215,7 +237,14 @@ void EffectManager :: Poll
             //||  (ringer & 32)
             )
             {
+                if (laserMode)
+                {
+                    PulseLaser();
+                }
+                laserMode = !laserMode;
+
                 SetMode(EM_MODE_RING);
+                
             } else {
                 SetMode(EM_MODE_IDLE);
                 if (switchEffect)

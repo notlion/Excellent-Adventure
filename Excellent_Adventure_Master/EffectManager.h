@@ -72,6 +72,7 @@ class EffectManager
     bool                                            m_disablePanels;
     bool                                            m_panelsDisabled;
 
+    bool                                            m_laserOn;
     char                                            m_mode;
     char                                            m_modePrevious;
     unsigned long                                   m_pollDelay;
@@ -125,7 +126,11 @@ public:
 
     void RebootPanels();
     bool RebootComplete();
+    // Note that this will be called during a ring, and will be auto-cut off
+    // at the beginning of the next frame.
 
+    void PulseLaser();
+    void LaserOff();
     void Poll
     (
         unsigned long                               time,
