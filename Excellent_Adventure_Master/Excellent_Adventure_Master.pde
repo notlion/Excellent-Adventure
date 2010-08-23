@@ -100,8 +100,8 @@ SLICControl SC;
 
 Effect effects[] =
 {
-//    {&WarpSpectrum, 0}
-    {&ElevatorSpectrum, 0}
+    {&WarpSpectrum, 0}
+//    {&ElevatorSpectrum, 0}
 //    {&CheckerBoard, 0}
 //    {&SimpleSpectrum, 0}
 //    {&Spotlight, 0}
