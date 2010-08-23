@@ -58,6 +58,18 @@ void SLICControl :: Poll
         m_debounceRemote = 
             (m_debounceRemote << 1) 
             |   (0x1 & digitalRead(SLIC_PIN_SWITCH_HOOK_R));
+#ifdef SLIC_FORCE_LOCAL_OFFHOOK
+        m_debounceLocal = DEBOUNCE_ALL_ONES;
+#endif
+#ifdef SLIC_FORCE_LOCAL_ONHOOK
+        m_debounceLocal = DEBOUNCE_ALL_ZEROS;
+#endif
+#ifdef SLIC_FORCE_REMOTE_OFFHOOK
+        m_debounceRemote = DEBOUNCE_ALL_ONES;
+#endif
+#ifdef SLIC_FORCE_REMOTE_ONHOOK
+        m_debounceRemote = DEBOUNCE_ALL_ZEROS;
+#endif
     }
 
     // If the values are steady, change the state.
@@ -224,11 +236,9 @@ void SLICControl :: RingLocal()
     {
         digitalWrite(SLIC_PIN_RINGER_L, RINGER_PIN_ON);
         m_isRingingLocal = RINGING_ON;
-
 #ifdef SLIC_DEBUG
         Serial.println("LOCAL: RING");
 #endif
-
     } 
     else if ((m_isRingingLocal == RINGING_ON) && (m_ringCountLocal >= RING_CADENCE_NUMER))
     {

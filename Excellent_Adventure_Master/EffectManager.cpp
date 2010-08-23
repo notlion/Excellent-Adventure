@@ -14,6 +14,11 @@
 #define EM_DEBUG(MSG)
 #endif
 
+#define SET_EFFECT(EFFECT,CURRENT_EFFECT)                                   \
+    effects = (EFFECT);                                                     \
+    currentEffect = (CURRENT_EFFECT);                                       \
+    runEffects = true;
+
 EffectManager :: EffectManager
 (
     PowerManagement                             *   pm
@@ -24,6 +29,7 @@ EffectManager :: EffectManager
     m_currentIdle = 0;
     m_currentRing = 0;
     m_currentCall = 0;
+    m_currentOver = 0;
     SetMode(EM_MODE_IDLE);
 }
 
@@ -202,7 +208,8 @@ void EffectManager :: Poll
                 m_mode = EM_MODE_IDLE;
                 if (switchEffect)
                 {
-                    if (++m_currentIdle >= m_sizeIdle)
+                    m_currentIdle++;
+                    if (m_currentIdle >= m_sizeIdle)
                     {
                         m_currentIdle = 0;
                     }
@@ -217,7 +224,8 @@ void EffectManager :: Poll
         case EM_MODE_CALL:
             if (switchEffect)
             {
-                if (++m_currentCall >= m_sizeCall)
+                m_currentCall++;
+                if (m_currentCall >= m_sizeCall)
                 {
                     m_currentCall = 0;
                 }
@@ -236,7 +244,8 @@ void EffectManager :: Poll
         case EM_MODE_CALL_OVERTIME:
             if (switchEffect)
             {
-                if (++m_currentOver >= m_sizeOver)
+                m_currentOver++;
+                if (m_currentOver >= m_sizeOver)
                 {
                     m_currentOver = 0;
                 }
@@ -279,19 +288,16 @@ void EffectManager :: Poll
             {
             case EM_MODE_IDLE:
                 EM_DEBUG("POLL, ONCE: IDLE");
-                effects = m_effectsIdle;
-                currentEffect = &m_currentIdle;
-                runEffects = true;
+                SET_EFFECT(m_effectsIdle, &m_currentIdle);
                 break;
             case EM_MODE_RING:
                 EM_DEBUG("POLL, ONCE: RING");
-                effects = m_effectsRing;
-                currentEffect = &m_currentRing;
-                if (++m_currentRing >= m_sizeRing)
+                m_currentRing++;
+                if (m_currentRing >= m_sizeRing)
                 {
                     m_currentRing = 0;
                 }
-                runEffects = true;
+                SET_EFFECT(m_effectsRing, &m_currentRing);
                 break;
             case EM_MODE_CALL:
                 EM_DEBUG("POLL, ONCE: CALL");
@@ -301,9 +307,7 @@ void EffectManager :: Poll
                 m_duration = time;
                 effectCount = 0;
                 // Restore the lights!
-                currentEffect = &m_currentCall;
-                effects = m_effectsCall;
-                runEffects = true;
+                SET_EFFECT(m_effectsCall, &m_currentCall);
                 break;               
             case EM_MODE_CALL_OVERTIME:
                 EM_DEBUG("POLL, ONCE: OVER");
@@ -311,9 +315,7 @@ void EffectManager :: Poll
                 // person is taking too long
                 effectCount = 0;
                 // Restore the lights!
-                effects = m_effectsOver;
-                currentEffect = &m_currentOver;
-                runEffects = true;
+                SET_EFFECT(m_effectsOver, &m_currentOver);
                 break;               
             case EM_MODE_CALLENDED:
                 EM_DEBUG("POLL, ONCE: CALLENDED");
@@ -362,11 +364,12 @@ void EffectManager :: Poll
         if (runEffects)
         {
             EM_DEBUG("runEffects");
-            EM_DEBUG((int)(*currentEffect));
+            //EM_DEBUG((int)(*currentEffect));
             //EM_DEBUG("ringer");
             //EM_DEBUG((int)(ringer));
             m_spectrum.ReadSpectrum();
-            effects[*currentEffect].func(&m_canvas, const_cast<EffectManager *>(this), EFFECTMODE_LOOP);
+            Effect *theEffect = (effects + (*currentEffect));
+            theEffect->func(&m_canvas, const_cast<EffectManager *>(this), EFFECTMODE_LOOP);
             m_canvas.BlitToPanels();
         }
         if (effectCount > 0)

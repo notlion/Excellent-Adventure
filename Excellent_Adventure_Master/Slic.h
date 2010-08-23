@@ -35,8 +35,11 @@
 #define RING_CADENCE_DENOM          6
 
 //#define SLIC_DEBUG
+//#define SLIC_FORCE_LOCAL_OFFHOOK
+//#define SLIC_FORCE_REMOTE_OFFHOOK
 
-
+//#define SLIC_FORCE_LOCAL_ONHOOK
+//#define SLIC_FORCE_REMOTE_ONHOOK
 
 
 class SLICControl
