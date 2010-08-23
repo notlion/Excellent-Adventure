@@ -91,7 +91,6 @@ int WarpSpectrum(Canvas *c, EffectManager *em, char mode)
 {
     static uint8_t ci = 0;
     static unsigned short pos[CANVAS_WIDTH];
-    //static          short vel[CANVAS_WIDTH];
     
     static char currentMode = -1;
     if(mode != currentMode){  // performed only once
@@ -215,11 +214,49 @@ int SolidColors(Canvas *c, EffectManager *em, char mode)
     if(spc_max > 1000){
         color_goal = colorwheel_lut[randInt(32)];
     }
-    
     color = lerpColor(color, color_goal, 0.1f);
 
     return 1;
 }
+
+int SolidSpectrum(Canvas *c, EffectManager *em, char mode)
+{
+    static Color_t color, color_goal;
+    
+    static char currentMode = -1;
+    if(mode != currentMode){  // performed only once
+        switch(mode){
+            case EFFECTMODE_INTRO:
+                color = colorwheel_lut[randInt(32)];
+                color_goal = color;
+                break;
+        }
+        currentMode = mode;
+    }
+    
+    unsigned short *spectrum = em->GetSpectrum();
+    unsigned short spc, spc_max = 0;
+    for(char x = 0; x < CANVAS_WIDTH; x++){
+        spc = spectrum[3 + (x >> 1)];
+        spc_max = MAX(spc_max, spc);
+        char spc_y = CANVAS_HEIGHT - (spc / 100);
+        for(char y = 0; y < CANVAS_HEIGHT; y++){
+            if(spc <= y)
+                c->PutPixel(x, y, color);
+            else
+                c->PutPixel(x, y, 0);
+        }
+    }
+    
+    if(spc_max > 1000){
+        color_goal = colorwheel_lut[randInt(32)];
+    }
+    color = lerpColor(color, color_goal, 0.1f);
+
+    return 1;
+}
+
+
 
 
 int SimpleColumns(Canvas *c, EffectManager *em, char mode)

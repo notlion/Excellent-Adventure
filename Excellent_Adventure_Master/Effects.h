@@ -17,7 +17,7 @@ int RingFlash        (Canvas *c, EffectManager *em, char mode);
 int BlitzyIdle       (Canvas *c, EffectManager *em, char mode);
 
 // What to do when people have taken too long
-int Overtime(Canvas *c, EffectManager *em, char mode);
+int Overtime         (Canvas *c, EffectManager *em, char mode);
 
 
 // Ideas
