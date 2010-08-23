@@ -1,6 +1,13 @@
 #include "Slic.h"
 #include <WProgram.h>
 
+#ifdef  SC_DEBUG_ENABLE
+#define SC_DEBUG(MSG)  PRINTLN(MSG)
+#define SC_DEBUG2(MSG) PRINT(MSG)
+#else
+#define SC_DEBUG(MSG)
+#define SC_DEBUG2(MSG)
+#endif
 
 
 SLICControl :: SLICControl()
@@ -65,6 +72,7 @@ void SLICControl :: Poll
         m_debounceRemote = 
             (m_debounceRemote << 1) 
             |   (0x1 & digitalRead(SLIC_PIN_SWITCH_HOOK_R));
+
 
 #ifdef SLIC_DEBUG_OFFON_LOCAL
         static int timer = 20000;
@@ -152,9 +160,7 @@ bool SLICControl :: IsOffHookRemote()
 
 void SLICControl :: StartRingingLocal()
 {
-#ifdef SLIC_DEBUG
-        PRINTLN("LOCAL: START RINGING");
-#endif
+    SC_DEBUG("SC:   LOCAL: START ringing");
     m_ringModeLocal = RINGING_ON;
     m_isRingingLocal = RINGING_OFF;
     m_ringTimeDiffLocal = m_time & 0xFFFF;
@@ -165,9 +171,7 @@ void SLICControl :: StartRingingLocal()
 
 void SLICControl :: StartRingingRemote()
 {
-#ifdef SLIC_DEBUG
-        PRINTLN("REMOTE: START RINGING");
-#endif
+    SC_DEBUG("SC:   REMOTE: START ringing");
 
     m_ringModeRemote = RINGING_ON;
     m_isRingingRemote = RINGING_OFF;
@@ -179,9 +183,7 @@ void SLICControl :: StartRingingRemote()
 
 void SLICControl :: StopRingingAll()
 {
-#ifdef SLIC_DEBUG
-        PRINTLN("ALL: STOP RINGING");
-#endif
+    //SC_DEBUG("SC:   ALL: STOP ringing");
     StopRingingLocal();
     StopRingingRemote();
 }
@@ -189,9 +191,7 @@ void SLICControl :: StopRingingAll()
 
 void SLICControl :: StopRingingLocal()
 {
-#ifdef SLIC_DEBUG
-        PRINTLN("LOCAL: STOP RINGING");
-#endif
+    SC_DEBUG("SC:   LOCAL: STOP ringing");
     m_ringModeLocal = RINGING_OFF;
     digitalWrite (SLIC_PIN_RING_MODE_L, RING_MODE_PIN_OFF);
     digitalWrite (SLIC_PIN_RINGER_L,    RINGER_PIN_OFF);
@@ -199,9 +199,7 @@ void SLICControl :: StopRingingLocal()
 
 void SLICControl :: StopRingingRemote()
 {
-#ifdef SLIC_DEBUG
-        PRINTLN("REMOTE: STOP RINGING");
-#endif
+    SC_DEBUG("SC:   REMOTE: STOP ringing");
 
     m_ringModeRemote = RINGING_OFF;
     digitalWrite (SLIC_PIN_RING_MODE_R, RING_MODE_PIN_OFF);
@@ -251,28 +249,22 @@ void SLICControl :: RingLocal()
             // increment to 1
             m_ringCountLocal = 0;
         }
-#ifdef SLIC_DEBUG
-        PRINT("RL: ");
-        PRINTLN((int)m_ringCountLocal);
-#endif
+        SC_DEBUG2("SC:   LOCAL: RING COUNT ");
+        SC_DEBUG((int)m_ringCountLocal);
     }
 
     if ((m_isRingingLocal == RINGING_OFF) && (m_ringCountLocal < RING_CADENCE_NUMER))
     {
         digitalWrite(SLIC_PIN_RINGER_L, RINGER_PIN_ON);
         m_isRingingLocal = RINGING_ON;
-#ifdef SLIC_DEBUG
-        PRINTLN("LOCAL: RING");
-#endif
+        SC_DEBUG("SC:   LOCAL:  ** RING **");
     } 
     else if ((m_isRingingLocal == RINGING_ON) && (m_ringCountLocal >= RING_CADENCE_NUMER))
     {
         digitalWrite(SLIC_PIN_RINGER_L, RINGER_PIN_OFF);
         m_isRingingLocal = RINGING_OFF;
-#ifdef SLIC_DEBUG
-        PRINTLN("LOCAL: NO RING");
-#endif
-    }
+        SC_DEBUG("SC:   LOCAL:  (NO RING)");
+    } 
 
 }
 
@@ -293,10 +285,8 @@ void SLICControl :: RingRemote()
             // increment to 1
             m_ringCountRemote = 0;
         }
-#ifdef SLIC_DEBUG
-        PRINT("RR: ");
-        PRINTLN((int)m_ringCountRemote);
-#endif
+        SC_DEBUG2("SC:   REMOTE: RING COUNT ");
+        SC_DEBUG((int)m_ringCountLocal);
     }
 
     // One second on, two seconds off.
@@ -304,17 +294,13 @@ void SLICControl :: RingRemote()
     {
         digitalWrite(SLIC_PIN_RINGER_R, RINGER_PIN_ON);
         m_isRingingRemote = RINGING_ON;
-#ifdef SLIC_DEBUG
-        PRINTLN("REMOTE: RING");
-#endif
+        SC_DEBUG("SC:   REMOTE:  ** RING **");
     } 
     else if ((m_isRingingRemote == RINGING_ON) && (m_ringCountRemote >= RING_CADENCE_NUMER))
     {
         digitalWrite(SLIC_PIN_RINGER_R, RINGER_PIN_OFF);
         m_isRingingRemote = RINGING_OFF;
-#ifdef SLIC_DEBUG
-        PRINTLN("REMOTE: NO RING");
-#endif
+        SC_DEBUG("SC:   REMOTE:  (NO RING)");
     }
 
 }

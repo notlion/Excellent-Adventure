@@ -80,9 +80,9 @@ char state;
 char debugState;
 #endif
 
-PowerManagement PM;
-EffectManager EM(&PM);
-SLICControl SC;
+PowerManagement     PM;
+EffectManager       EM(&PM);
+SLICControl         SC;
 
 void setup()
 {

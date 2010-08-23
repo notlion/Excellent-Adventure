@@ -156,13 +156,13 @@ void EffectManager :: SetMode
 
 void EffectManager :: EnableEffects()
 {
-    EM_DEBUG("EM: Enable Effects");
+    EM_DEBUG("EM:   Enable Effects - LEAVING LOW POWER MODE");
     m_disablePanels = false;
 }
 
 void EffectManager :: DisableEffects()
 {
-    EM_DEBUG("EM: Disable Effects");
+    EM_DEBUG("EM:   Disable Effects - ENTERING LOW POWER MODE");
     m_disablePanels = true;
 }
 
@@ -186,7 +186,7 @@ unsigned short EffectManager :: GetRandomNumber()
 // repeatedly check the status of the reboot.
 void EffectManager :: RebootPanels()
 {
-    EM_DEBUG("EM: Rebooting");
+    EM_DEBUG("EM:   Rebooting panels...");
     m_rebooting = true;
     RebootComplete();
 }
@@ -203,7 +203,7 @@ bool EffectManager :: RebootComplete()
                 m_pm->PowerDown();
             } else {
                 m_pm->PowerUp();
-                EM_DEBUG("EM: Reboot is complete.");
+                EM_DEBUG("EM:   Reboot complete!");
                 // Idea: wait another bit before switching mode?
                 m_rebooting = false;
             }
@@ -290,7 +290,7 @@ void EffectManager :: Poll
             }
             if ((time - m_duration) > MAX_CALL_DURATION_MS)
             {
-                EM_DEBUG("EM: Call went overtime.");
+                EM_DEBUG("EM:   Call went overtime.");
                 SetMode(EM_MODE_CALL_OVERTIME);
             }
             break;
@@ -338,12 +338,12 @@ void EffectManager :: Poll
             switch(m_mode)
             {
             case EM_MODE_IDLE:
-                EM_DEBUG("EM: State: IDLE");
+                EM_DEBUG("EM:   State: IDLE");
                 LaserOff();
                 SET_EFFECT(m_effectsIdle, &m_currentIdle);
                 break;
             case EM_MODE_RING:
-                EM_DEBUG("EM: State: RING");
+                EM_DEBUG("EM:   State: RING");
                 LaserOn();
                 m_currentRing++;
                 if (m_currentRing >= m_sizeRing)
@@ -353,7 +353,7 @@ void EffectManager :: Poll
                 SET_EFFECT(m_effectsRing, &m_currentRing);
                 break;
             case EM_MODE_CALL:
-                EM_DEBUG("EM: State: CALL");
+                EM_DEBUG("EM:   State: CALL");
 
                 // The current time so we can shut down the effects if the
                 // person is taking too long
@@ -363,7 +363,7 @@ void EffectManager :: Poll
                 SET_EFFECT(m_effectsCall, &m_currentCall);
                 break;               
             case EM_MODE_CALL_OVERTIME:
-                EM_DEBUG("EM: State: OVER");
+                EM_DEBUG("EM:   State: OVER");
                 // The current time so we can shut down the effects if the
                 // person is taking too long
                 effectCount = 0;
@@ -371,17 +371,17 @@ void EffectManager :: Poll
                 SET_EFFECT(m_effectsOver, &m_currentOver);
                 break;             
             case EM_MODE_CALLENDED_REBOOTED:
-                EM_DEBUG("EM: State: CALLENDED_REBOOTED");
+                EM_DEBUG("EM:   State: CALLENDED_REBOOTED");
                 break;  
             case EM_MODE_CALLENDED:
-                EM_DEBUG("EM: State: CALLENDED");
+                EM_DEBUG("EM:   State: CALLENDED");
                 // The call ended, fade those panels out.
                 m_canvas.FadeToBlack();
                 m_pollDelay += EM_FADE_DELAY_MS;
                 SetMode(EM_MODE_CALLENDED_FADE_END);
                 break;
             case EM_MODE_CALLENDED_FADE_END:
-                EM_DEBUG("EM: State: FADEEND");
+                EM_DEBUG("EM:   State: FADEEND");
                 // Wait until the power manager is ready, and then
                 // reboot the panels:
                 RebootPanels();
@@ -399,21 +399,21 @@ void EffectManager :: Poll
                 }*/
                 break;
             case EM_MODE_DISABLE:
-                EM_DEBUG("EM: State: DISABLE");
+                EM_DEBUG("EM:   State: DISABLE - Fading panels");
                 // Fade out
                 m_canvas.FadeToBlack();
                 m_pollDelay += EM_FADE_DELAY_MS; // 2 seconds delay
                 SetMode(EM_MODE_DISABLE_FADE_END);
                 break;
             case EM_MODE_DISABLE_FADE_END:
-                EM_DEBUG("EM: State: DISABLE_FADEEND");
+                EM_DEBUG("EM:   State: DISABLE_FADEEND");
                 // We're all faded out, terminate power.  The only way out of 
                 // this mode is a call to EnableEffects().
                 m_pm->PowerDown();
                 SetMode(EM_MODE_DISABLE_STANDBY);
                 break;
             case EM_MODE_DISABLE_STANDBY:
-                EM_DEBUG("EM: State: DISABLE_STANDBY");
+                EM_DEBUG("EM:   State: DISABLE_STANDBY - Low power mode activated.");
                 break;
             default:
                 break;
@@ -458,7 +458,7 @@ void EffectManager :: Poll
                 );
                 break;
             default:
-                EM_DEBUG("EM: ERROR MODE");
+                EM_DEBUG("EM:   ERROR MODE");
                 break;
             }
             

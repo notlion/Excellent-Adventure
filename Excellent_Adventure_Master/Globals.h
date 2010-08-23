@@ -33,7 +33,7 @@
 
 
 // Show messages in the SLIC:
-#define SLIC_DEBUG
+#define SC_DEBUG_ENABLE
 
 
 
@@ -50,8 +50,8 @@
 // every 5-10 seconds
 //#define SLIC_DEBUG_OFFON_LOCAL
 
-#define LASER_TIME_ON_MS                256
-#define LASER_TIME_OFF_MS               64
+#define LASER_TIME_ON_MS                512
+#define LASER_TIME_OFF_MS               128
 
 
 #define I2C_RATE                        100000

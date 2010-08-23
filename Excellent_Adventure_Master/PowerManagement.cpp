@@ -48,7 +48,7 @@ bool PowerManagement :: GetLowPowerStatus()
 
 void PowerManagement :: PowerUp()
 {
-    PM_DEBUG("PM: PowerUp");
+    PM_DEBUG("PM:   Powering Up");
     m_powerStatus = PM_POWER_ON;
 #ifdef PM_DISABLE
     m_ready = true;
@@ -61,7 +61,7 @@ void PowerManagement :: PowerUp()
 
 void PowerManagement :: PowerDown()
 {
-    PM_DEBUG("PM: PowerDown");
+    PM_DEBUG("PM:   Powering Down");
     m_powerStatus = PM_POWER_OFF;
 #ifdef PM_DISABLE
     m_ready = true;
@@ -86,9 +86,10 @@ bool PowerManagement :: Poll
         m_time = time;
 
         // Shift the bitfield down one, and append the last value read.
+        int lightSensor = analogRead(BOOTH_PIN_LIGHT_SENSOR);
         m_debounce = 
             (m_debounce << 1) 
-            |   (   (analogRead(BOOTH_PIN_LIGHT_SENSOR) > LIGHT_SENSOR_THRESHOLD)
+            |   (   (lightSensor > LIGHT_SENSOR_THRESHOLD)
                     ?   0x1 
                     :   0
                 );
@@ -106,8 +107,15 @@ bool PowerManagement :: Poll
         if (m_lowPowerStatusOld != m_lowPowerStatus)
         {
             m_lowPowerStatusOld = m_lowPowerStatus;
-            PM_DEBUG2("PM: LOW POWER STATUS CHANGED == ");
-            PM_DEBUG((int)m_lowPowerStatus);
+#ifdef PM_DEBUG_ENABLE
+            PM_DEBUG2("PM:   Low power status --> ");
+            if (m_lowPowerStatus == PM_LOW_POWER_MODE_ON)
+            {
+                PM_DEBUG("ON");
+            } else {
+                PM_DEBUG("OFF");
+            }
+#endif
             return true;
         }
     }
