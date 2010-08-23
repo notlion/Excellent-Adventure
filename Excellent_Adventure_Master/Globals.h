@@ -7,7 +7,7 @@
 //#define USE_MAPLE
 
 #define USE_UART
-
+//#define USE_PANEL_SIMULATOR
 
 
 #define I2C_RATE                100000

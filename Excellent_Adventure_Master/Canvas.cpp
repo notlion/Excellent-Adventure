@@ -315,11 +315,13 @@ void Canvas :: BlitToPanels()
     SERIAL_WRITE(RGB, 4);
 #endif
 
+#ifdef USE_PANEL_SIMULATOR
 #ifdef USE_UART
     // This is a sync frame:
 
     RGB[0] = RGB[1] = RGB[2] = RGB[3] = 0xFF;
     SERIAL_WRITE(RGB, 4);
+#endif
 #else
     // Sets the color immediately ('n')
     // Fade to color ('c')
@@ -354,9 +356,11 @@ void Canvas :: BlitToPanels()
                 //    RGB[2] = GREEN256(color);
                 //    RGB[3] = BLUE256(color);
                 //}
+#ifdef USE_PANEL_SIMULATOR
 #ifdef USE_UART
                 RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
                 SERIAL_WRITE(RGB, 4);
+#endif
 #else
                 
                 I2C_WRITE((unsigned)(*addr), &RGB[0], 4);
@@ -375,9 +379,11 @@ void Canvas :: BlitToPanels()
         RGB[1] = CEILING_WHITE(color);
         RGB[2] = CEILING_UV(color);
         RGB[3] = 0;
+#ifdef USE_PANEL_SIMULATOR
 #ifdef USE_UART
         RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
         SERIAL_WRITE(RGB, 4);
+#endif
 #else
         I2C_WRITE((unsigned)(*addr), &RGB[0], 4);
 #endif
