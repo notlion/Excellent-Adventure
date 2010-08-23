@@ -77,6 +77,7 @@ class EffectManager
     char                                            m_modePrevious;
     unsigned long                                   m_pollDelay;
     unsigned long                                   m_duration;
+    unsigned long                                   m_pollLaser;
     Canvas                                          m_canvas;
     Spectrum                                        m_spectrum;
     PowerManagement                             *   m_pm;
@@ -129,8 +130,13 @@ public:
     // Note that this will be called during a ring, and will be auto-cut off
     // at the beginning of the next frame.
 
-    void PulseLaser();
+    void LaserOn();
     void LaserOff();
+    void PollLaser
+    (
+        unsigned long                               time
+    );
+        
     void Poll
     (
         unsigned long                               time,

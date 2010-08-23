@@ -28,6 +28,7 @@ EffectManager :: EffectManager
 )
 {
     m_laserOn = false;
+    m_pollLaser = m_pollDelay = millis();
     m_pm = pm;
     m_modePrevious = -1;
     m_currentIdle = 0;
@@ -78,24 +79,48 @@ void EffectManager :: InitSpectrum()
     m_spectrum.InitSpectrumPins();
 }
 
-void EffectManager :: PulseLaser()
+void EffectManager :: LaserOn()
 {
     if (!m_panelsDisabled)
     {
         m_laserOn = true;
-        digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_ENABLE);
+        EM_DEBUG("EM: Laser ON");
     }
 }
 
 void EffectManager :: LaserOff()
 {
-    if (m_laserOn)
-    {
-        m_laserOn = false;
-        digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_DISABLE);
-    }
+    m_laserOn = false;
+    EM_DEBUG("EM: Laser OFF");
+    digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_DISABLE);
 }
 
+void EffectManager :: PollLaser
+(
+    unsigned long                                   time
+)
+{
+    if (m_laserOn)
+    {
+        static bool laserMode = false;
+        if (laserMode)
+        {
+            if ((time - m_pollLaser) > LASER_TIME_ON_MS)
+            {
+                digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_DISABLE);
+                m_pollLaser = time;
+                laserMode = false;
+            }
+        } else {
+            if ((time - m_pollLaser) > LASER_TIME_OFF_MS)
+            {
+                digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_ENABLE);
+                m_pollLaser = time;
+                laserMode = true;
+            }
+        }
+    }
+}
 
 void EffectManager :: AddEffectsArrays
 ( 
@@ -198,10 +223,9 @@ void EffectManager :: Poll
     static bool runEffects = false;
     static unsigned short effectCount = 0;
     static bool laserMode = false;
+    PollLaser(time);        
     if ((time - m_pollDelay) > EFFECT_POLL_DELAY_MS)
     {
-        LaserOff();
-        
         //EM_DEBUG("BEGIN POLL");
         //EM_DEBUG(effectCount);
         //static int ringer = 0;
@@ -230,12 +254,6 @@ void EffectManager :: Poll
             //||  (ringer & 32)
             )
             {
-                if (laserMode)
-                {
-                    PulseLaser();
-                }
-                laserMode = !laserMode;
-
                 SetMode(EM_MODE_RING);
                 
             } else {
@@ -277,6 +295,7 @@ void EffectManager :: Poll
             }
             break;
         case EM_MODE_CALL_OVERTIME:
+            // Whoops, the person was on the line too long:
             if (switchEffect)
             {
                 m_currentOver++;
@@ -286,9 +305,6 @@ void EffectManager :: Poll
                 }
 
             }            
-
-            // Whoops, the person was on the line too long:
-            //currentEffect = m_currentOver;
             if (!offHook)
             {
                 SetMode(EM_MODE_CALLENDED);
@@ -323,10 +339,12 @@ void EffectManager :: Poll
             {
             case EM_MODE_IDLE:
                 EM_DEBUG("EM: State: IDLE");
+                LaserOff();
                 SET_EFFECT(m_effectsIdle, &m_currentIdle);
                 break;
             case EM_MODE_RING:
                 EM_DEBUG("EM: State: RING");
+                LaserOn();
                 m_currentRing++;
                 if (m_currentRing >= m_sizeRing)
                 {

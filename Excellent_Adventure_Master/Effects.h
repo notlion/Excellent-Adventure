@@ -3,6 +3,15 @@
 #include "EffectManager.h"
 
 
+// Idle effects
+int BlitzyIdle        (Canvas *c, EffectManager *em, char mode);
+
+// Ring Effects
+int RingRainbow       (Canvas *c, EffectManager *em, char mode);
+int RingRadio         (Canvas *c, EffectManager *em, char mode);
+int RingFlash         (Canvas *c, EffectManager *em, char mode);
+
+// More effects!
 int SimpleSpectrum    (Canvas *c, EffectManager *em, char mode);
 int WarpSpectrum      (Canvas *c, EffectManager *em, char mode);
 int PinwheelSpectrum  (Canvas *c, EffectManager *em, char mode);
@@ -15,11 +24,8 @@ int SimpleColumns     (Canvas *c, EffectManager *em, char mode);
 int Spotlight         (Canvas *c, EffectManager *em, char mode);
 int CheckerBoard      (Canvas *c, EffectManager *em, char mode);
                       
-int RingRainbow       (Canvas *c, EffectManager *em, char mode);
-int RingRadio         (Canvas *c, EffectManager *em, char mode);
-int RingFlash         (Canvas *c, EffectManager *em, char mode);
-int BlitzyIdle        (Canvas *c, EffectManager *em, char mode);
 
+// Overtime effects
 // What to do when people have taken too long
 int Overtime          (Canvas *c, EffectManager *em, char mode);
 
