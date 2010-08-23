@@ -80,7 +80,7 @@ void EffectManager :: InitSpectrum()
 
 void EffectManager :: PulseLaser()
 {
-    if (m_pm->GetLowPowerStatus() == PM_LOW_POWER_MODE_OFF)
+    if (!m_panelsDisabled)
     {
         m_laserOn = true;
         digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_ENABLE);
