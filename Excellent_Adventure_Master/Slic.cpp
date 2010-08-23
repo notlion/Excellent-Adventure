@@ -13,7 +13,14 @@ SLICControl :: SLICControl()
 
     m_ringModeLocal = RINGING_OFF;
     m_ringModeRemote = RINGING_OFF;
-
+    m_isRingingLocal = RINGING_OFF;
+    m_isRingingRemote = RINGING_OFF;
+    m_ringEdgeLocal = false; 
+    m_ringEdgeRemote = false; 
+    m_ringCountLocal = 0;
+    m_ringCountRemote = 0;
+    m_ringTimeDiffLocal = 0;
+    m_ringTimeDiffRemote = 0;
 
 }
 

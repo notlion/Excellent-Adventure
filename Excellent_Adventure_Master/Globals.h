@@ -10,11 +10,15 @@
 
 // You must enable the UART to use the simulator.  Using the simulator will
 // disable the I2C panel communications.
-//#define USE_PANEL_SIMULATOR
+#define USE_PANEL_SIMULATOR
 
 
 
 // DEBUG enabling:
+
+// Enable debug messages for the power management
+#define PM_DEBUG_ENABLE
+
 
 // Enable debug messages for the effect manager
 #define EM_DEBUG_ENABLE

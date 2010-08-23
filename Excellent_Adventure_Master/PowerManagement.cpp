@@ -2,13 +2,22 @@
 #include "Globals.h"
 #include <WProgram.h>
 
+#ifdef PM_DEBUG_ENABLE
+#define PM_DEBUG(MSG)  PRINTLN(MSG)
+#define PM_DEBUG2(MSG) PRINT(MSG)
+#else
+#define PM_DEBUG(MSG)
+#define PM_DEBUG2(MSG)
+#endif
+
+
 PowerManagement :: PowerManagement()
 {
     m_time = millis();
     m_ready = true;
     m_lowPowerStatus = PM_LOW_POWER_MODE_OFF;
     m_lowPowerStatusOld = PM_LOW_POWER_MODE_OFF;
-    m_powerStatus = PM_POWER_OFF;
+    m_powerStatus = PM_POWER_ON;
 }
 
 PowerManagement :: ~PowerManagement()
@@ -39,6 +48,7 @@ bool PowerManagement :: GetLowPowerStatus()
 
 void PowerManagement :: PowerUp()
 {
+    PM_DEBUG("PM: PowerUp");
     digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_DISABLE);
     m_powerStatus = PM_POWER_ON;
     m_time = millis();
@@ -47,6 +57,7 @@ void PowerManagement :: PowerUp()
 
 void PowerManagement :: PowerDown()
 {
+    PM_DEBUG("PM: PowerDown");
     digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_ENABLE);
     m_powerStatus = PM_POWER_OFF;
     m_time = millis();
@@ -86,6 +97,8 @@ bool PowerManagement :: Poll
         if (m_lowPowerStatusOld != m_lowPowerStatus)
         {
             m_lowPowerStatusOld = m_lowPowerStatus;
+            PM_DEBUG2("PM: LOW POWER STATUS CHANGED == ");
+            PM_DEBUG((int)m_lowPowerStatus);
             return true;
         }
     }
