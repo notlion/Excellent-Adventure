@@ -6,15 +6,15 @@
 #define USE_ARDUINO
 //#define USE_MAPLE
 
-#define USE_UART
-#define USE_PANEL_SIMULATOR
+//#define USE_UART
+//#define USE_PANEL_SIMULATOR
 
 
 
 // DEBUG enabling:
 
 // Enable debug messages for the effect manager
-#define EM_DEBUG_ENABLE
+//#define EM_DEBUG_ENABLE
 
 // Turns off the blittin (will not show anything on panels if you enable
 // this):

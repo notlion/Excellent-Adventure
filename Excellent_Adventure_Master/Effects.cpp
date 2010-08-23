@@ -257,8 +257,6 @@ int SolidSpectrum(Canvas *c, EffectManager *em, char mode)
 }
 
 
-
-
 int SimpleColumns(Canvas *c, EffectManager *em, char mode)
 {
     static Channel_t n = 0;
@@ -427,6 +425,37 @@ int BlitzyIdle(Canvas *c, EffectManager *em, char mode)
     return 1;
 }
 
+
+int RingRainbow(Canvas *c, EffectManager *em, char mode)
+{
+    static Color_t colors[16];
+    static uint8_t band_pos = 0;
+    static uint8_t cw_pos = 0;
+    
+    // shift color array
+    for(int i = 16; --i >= 1;)
+        colors[i] = colors[i - 1];
+    
+    // assign new color
+    if(band_pos < 4){
+        colors[0] = colorwheel_lut[cw_pos];
+        if(band_pos == 3)
+            cw_pos = (cw_pos + 4) & 31;
+    }
+    else{
+        colors[0] = 0;
+    }
+    if(++band_pos > 8)
+        band_pos = 0;
+    
+    // draw to pixels
+    for(char y = 0; y < CANVAS_HEIGHT; y++){
+        for(char x = 0; x < CANVAS_WIDTH; x++){
+            int d = int(dist(x * 2, y * 2, 7, 9));
+            c->PutPixel(x, y, colors[d & 15]);
+        }
+    }
+}
 
 int RingFlash(Canvas *c, EffectManager *em, char mode)
 {
