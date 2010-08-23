@@ -355,7 +355,6 @@ void EffectManager :: Poll
             case EM_MODE_CALL:
                 LaserOff();
                 EM_DEBUG("EM:   State: CALL");
-
                 // The current time so we can shut down the effects if the
                 // person is taking too long
                 m_duration = time;
