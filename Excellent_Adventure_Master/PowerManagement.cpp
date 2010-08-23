@@ -2,13 +2,22 @@
 #include "Globals.h"
 #include <WProgram.h>
 
+#ifdef PM_DEBUG_ENABLE
+#define PM_DEBUG(MSG)  PRINTLN(MSG)
+#define PM_DEBUG2(MSG) PRINT(MSG)
+#else
+#define PM_DEBUG(MSG)
+#define PM_DEBUG2(MSG)
+#endif
+
+
 PowerManagement :: PowerManagement()
 {
     m_time = millis();
     m_ready = true;
     m_lowPowerStatus = PM_LOW_POWER_MODE_OFF;
     m_lowPowerStatusOld = PM_LOW_POWER_MODE_OFF;
-    m_powerStatus = PM_POWER_OFF;
+    m_powerStatus = PM_POWER_ON;
 }
 
 PowerManagement :: ~PowerManagement()
@@ -39,18 +48,28 @@ bool PowerManagement :: GetLowPowerStatus()
 
 void PowerManagement :: PowerUp()
 {
-    digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_DISABLE);
+    PM_DEBUG("PM: PowerUp");
     m_powerStatus = PM_POWER_ON;
+#ifdef PM_DISABLE
+    m_ready = true;
+#else
+    digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_DISABLE);
     m_time = millis();
     m_ready = false;
+#endif
 }
 
 void PowerManagement :: PowerDown()
 {
-    digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_ENABLE);
+    PM_DEBUG("PM: PowerDown");
     m_powerStatus = PM_POWER_OFF;
+#ifdef PM_DISABLE
+    m_ready = true;
+#else
+    digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_ENABLE);
     m_time = millis();
     m_ready = false;
+#endif
 }
 
 // The poll function checks the value of the light sensor.  The signal is
@@ -61,6 +80,7 @@ bool PowerManagement :: Poll
     unsigned long                                   time
 )
 {
+#ifndef PM_DISABLE
     if ((time - m_time) > LIGHT_SENSOR_POLLING_MS)
     {
         m_time = time;
@@ -86,10 +106,12 @@ bool PowerManagement :: Poll
         if (m_lowPowerStatusOld != m_lowPowerStatus)
         {
             m_lowPowerStatusOld = m_lowPowerStatus;
+            PM_DEBUG2("PM: LOW POWER STATUS CHANGED == ");
+            PM_DEBUG((int)m_lowPowerStatus);
             return true;
         }
     }
-
+#endif
     return false;
 }
 

@@ -404,20 +404,40 @@ void EffectManager :: Poll
         }
         if (runEffects)
         {
-            Effect *effect;
+            m_spectrum.ReadSpectrum();
             switch(m_mode)
             {
             case EM_MODE_IDLE:
-                effect = &m_effectsIdle[m_currentIdle];
+                m_effectsIdle[m_currentIdle].func
+                (
+                    &m_canvas, 
+                    const_cast<EffectManager *>(this), 
+                    EFFECTMODE_LOOP
+                );
                 break;
             case EM_MODE_RING:
-                effect = &m_effectsRing[m_currentRing];
+                m_effectsRing[m_currentRing].func
+                (
+                    &m_canvas, 
+                    const_cast<EffectManager *>(this), 
+                    EFFECTMODE_LOOP
+                );
                 break;
             case EM_MODE_CALL:
-                effect = &m_effectsCall[m_currentCall];
+                m_effectsCall[m_currentCall].func
+                (
+                    &m_canvas, 
+                    const_cast<EffectManager *>(this), 
+                    EFFECTMODE_LOOP
+                );
                 break;
             case EM_MODE_CALL_OVERTIME:
-                effect = &m_effectsOver[m_currentOver];
+                m_effectsOver[m_currentOver].func
+                (
+                    &m_canvas, 
+                    const_cast<EffectManager *>(this), 
+                    EFFECTMODE_LOOP
+                );
                 break;
             default:
                 EM_DEBUG("EM: ERROR MODE");
@@ -428,9 +448,8 @@ void EffectManager :: Poll
             //EM_DEBUG((int)(*currentEffect));
             //EM_DEBUG("ringer");
             //EM_DEBUG((int)(ringer));
-            m_spectrum.ReadSpectrum();
             //Effect *theEffect = (effects + (*currentEffect));
-            effect->func(&m_canvas, const_cast<EffectManager *>(this), EFFECTMODE_LOOP);
+            
 #ifdef EM_DEBUG_NOBLIT
             //EM_DEBUG("BLIT!");
 #else
