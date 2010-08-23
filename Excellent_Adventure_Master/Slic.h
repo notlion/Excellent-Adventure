@@ -41,6 +41,8 @@
 //#define SLIC_FORCE_LOCAL_ONHOOK
 //#define SLIC_FORCE_REMOTE_ONHOOK
 
+//#define SLIC_DEBUG_OFFON_LOCAL
+
 
 class SLICControl
 {

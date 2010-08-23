@@ -26,4 +26,52 @@ int Overtime         (Canvas *c, EffectManager *em, char mode);
 // Pulsing Spotlight on Phone
 
 
+#define EFFECTS_NUM_IDLE 1
+#define EFFECTS_NUM_RING 2
+#define EFFECTS_NUM_CALL 7
+#define EFFECTS_NUM_OVER 1
+
+static Effect effectsIdle[EFFECTS_NUM_IDLE] =
+{ 
+    {&BlitzyIdle, 0}
+//    {&SimpleSpectrum, 0}
+//    {&CheckerBoard, 0}
+//    {&SimpleSpectrum, 0}
+//    {&Spotlight, 0}
+//    {&SimpleColumns, 0}
+};
+
+static Effect effectsRing[EFFECTS_NUM_RING] =
+{ 
+    {&RingFlash, 0}
+//    {&CheckerBoard, 0}
+//    {&SimpleColumns, 0}
+,   {&Spotlight, 0}
+//,   {&SimpleColumns, 0}
+};
+
+static Effect effectsCall[EFFECTS_NUM_CALL] =
+{ 
+    {&SimpleColumns, 0}
+,   {&CheckerBoard, 0}
+//    {&SimpleColumns, 0}
+,   {&Spotlight, 0}
+,   {&WarpSpectrum, 0}
+,   {&ElevatorSpectrum, 0}
+,   {&PinwheelSpectrum, 0}
+,   {&SolidColors, 0}
+//,   {&SimpleColumns, 0}
+};
+
+static Effect effectsOver[EFFECTS_NUM_OVER] =
+{ 
+    {&Overtime, 0}
+//,   {&CheckerBoard, 0}
+//    {&SimpleColumns, 0}
+//,   {&Spotlight, 0}
+//,   {&SimpleColumns, 0}
+};
+
+
+
 #endif

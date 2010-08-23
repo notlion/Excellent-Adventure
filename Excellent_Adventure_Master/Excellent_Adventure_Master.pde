@@ -84,49 +84,6 @@ PowerManagement PM;
 EffectManager EM(&PM);
 SLICControl SC;
 
-#define EFFECTS_NUM_IDLE 1
-#define EFFECTS_NUM_RING 2
-#define EFFECTS_NUM_CALL 3
-#define EFFECTS_NUM_OVER 1
-
-Effect effectsIdle[EFFECTS_NUM_IDLE] =
-{ 
-    {&BlitzyIdle, 0}
-//    {&SimpleSpectrum, 0}
-//    {&CheckerBoard, 0}
-//    {&SimpleSpectrum, 0}
-//    {&Spotlight, 0}
-//    {&SimpleColumns, 0}
-};
-
-Effect effectsRing[EFFECTS_NUM_RING] =
-{ 
-    {&RingFlash, 0}
-//    {&CheckerBoard, 0}
-//    {&SimpleColumns, 0}
-,   {&Spotlight, 0}
-//,   {&SimpleColumns, 0}
-};
-
-Effect effectsCall[EFFECTS_NUM_CALL] =
-{ 
-    {&SimpleColumns, 0}
-,   {&CheckerBoard, 0}
-//    {&SimpleColumns, 0}
-,   {&Spotlight, 0}
-//,   {&SimpleColumns, 0}
-};
-
-Effect effectsOver[EFFECTS_NUM_OVER] =
-{ 
-    {&Overtime, 0}
-//,   {&CheckerBoard, 0}
-//    {&SimpleColumns, 0}
-//,   {&Spotlight, 0}
-//,   {&SimpleColumns, 0}
-};
-
-
 void setup()
 {
     state = STATE_IDLE;
