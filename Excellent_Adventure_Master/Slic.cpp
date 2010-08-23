@@ -59,7 +59,7 @@ void SLICControl :: Poll
             (m_debounceRemote << 1) 
             |   (0x1 & digitalRead(SLIC_PIN_SWITCH_HOOK_R));
 
-#ifdef SLIC_OFFON_LOCAL
+#ifdef SLIC_DEBUG_OFFON_LOCAL
         static int timer = 20000;
         if (timer > 10000)
         {
