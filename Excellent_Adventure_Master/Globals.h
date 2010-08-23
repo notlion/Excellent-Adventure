@@ -7,11 +7,11 @@
 //#define USE_MAPLE
 
 
-//#define USE_UART
+#define USE_UART
 
 // You must enable the UART to use the simulator.  Using the simulator will
 // disable the I2C panel communications.
-//#define USE_PANEL_SIMULATOR
+#define USE_PANEL_SIMULATOR
 
 
 
@@ -29,8 +29,8 @@
 
 // Force the values of the SLIC offhooks:
 
-//#define SLIC_FORCE_LOCAL_OFFHOOK
-//#define SLIC_FORCE_REMOTE_OFFHOOK
+#define SLIC_FORCE_LOCAL_OFFHOOK
+#define SLIC_FORCE_REMOTE_OFFHOOK
 
 //#define SLIC_FORCE_LOCAL_ONHOOK
 //#define SLIC_FORCE_REMOTE_ONHOOK
