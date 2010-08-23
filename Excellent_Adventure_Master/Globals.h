@@ -10,16 +10,18 @@
 
 // You must enable the UART to use the simulator.  Using the simulator will
 // disable the I2C panel communications.
-#define USE_PANEL_SIMULATOR
+//#define USE_PANEL_SIMULATOR
 
-#define CEILING_LIGHTS_DISABLE
+//#define CEILING_LIGHTS_DISABLE
+
+//#define PM_DISABLE
+
 
 // DEBUG enabling:
 
 // Enable debug messages for the power management
 #define PM_DEBUG_ENABLE
 
-#define PM_DISABLE
 
 // Enable debug messages for the effect manager
 #define EM_DEBUG_ENABLE
@@ -28,8 +30,12 @@
 // this):
 //#define EM_DEBUG_NOBLIT
 
+
 // Show messages in the SLIC:
-//#define SLIC_DEBUG
+#define SLIC_DEBUG
+
+
+
 
 // Force the values of the SLIC offhooks:
 
