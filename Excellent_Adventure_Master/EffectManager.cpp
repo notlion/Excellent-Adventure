@@ -242,7 +242,6 @@ void EffectManager :: Poll
         {
         case EM_MODE_RING:
         case EM_MODE_IDLE:
-        default:
             if (m_disablePanels)
             {
                 SetMode(EM_MODE_DISABLE);
@@ -328,6 +327,9 @@ void EffectManager :: Poll
             m_pollDelay += EM_FADE_DELAY_MS; // To reduce poll time.
 
             break;
+        default:
+            break;
+
         }
 
         if (m_modePrevious != m_mode)
@@ -382,7 +384,7 @@ void EffectManager :: Poll
                 SetMode(EM_MODE_CALLENDED_FADE_END);
                 break;
             case EM_MODE_CALLENDED_FADE_END:
-                EM_DEBUG("EM:   State: FADEEND");
+                EM_DEBUG("EM:   State: CALLENDED FADEEND");
                 // Wait until the power manager is ready, and then
                 // reboot the panels:
                 RebootPanels();

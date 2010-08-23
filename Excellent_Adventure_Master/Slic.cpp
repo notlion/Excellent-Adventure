@@ -286,7 +286,7 @@ void SLICControl :: RingRemote()
             m_ringCountRemote = 0;
         }
         SC_DEBUG2("SC:   REMOTE: RING COUNT ");
-        SC_DEBUG((int)m_ringCountLocal);
+        SC_DEBUG((int)m_ringCountRemote);
     }
 
     // One second on, two seconds off.

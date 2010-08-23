@@ -109,7 +109,7 @@
 
 
 // When fading to black, how long to wait until we power down:
-#define EM_FADE_DELAY_MS                2000
+#define EM_FADE_DELAY_MS                2048
 
 /////////////////////////////////////////////////////////////////////////////
 //
