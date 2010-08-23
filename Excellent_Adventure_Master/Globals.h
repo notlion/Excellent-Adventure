@@ -7,7 +7,7 @@
 //#define USE_MAPLE
 
 #define USE_UART
-//#define USE_PANEL_SIMULATOR
+#define USE_PANEL_SIMULATOR
 
 
 
