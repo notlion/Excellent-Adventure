@@ -34,42 +34,28 @@ int Overtime         (Canvas *c, EffectManager *em, char mode);
 static Effect effectsIdle[EFFECTS_NUM_IDLE] =
 { 
     {&BlitzyIdle, 0}
-//    {&SimpleSpectrum, 0}
-//    {&CheckerBoard, 0}
-//    {&SimpleSpectrum, 0}
-//    {&Spotlight, 0}
-//    {&SimpleColumns, 0}
 };
 
 static Effect effectsRing[EFFECTS_NUM_RING] =
 { 
     {&RingFlash, 0}
-//    {&CheckerBoard, 0}
-//    {&SimpleColumns, 0}
 ,   {&Spotlight, 0}
-//,   {&SimpleColumns, 0}
 };
 
 static Effect effectsCall[EFFECTS_NUM_CALL] =
 { 
     {&SimpleColumns, 0}
 ,   {&CheckerBoard, 0}
-//    {&SimpleColumns, 0}
 ,   {&Spotlight, 0}
 ,   {&WarpSpectrum, 0}
 ,   {&ElevatorSpectrum, 0}
 ,   {&PinwheelSpectrum, 0}
 ,   {&SolidColors, 0}
-//,   {&SimpleColumns, 0}
 };
 
 static Effect effectsOver[EFFECTS_NUM_OVER] =
 { 
     {&Overtime, 0}
-//,   {&CheckerBoard, 0}
-//    {&SimpleColumns, 0}
-//,   {&Spotlight, 0}
-//,   {&SimpleColumns, 0}
 };
 
 
