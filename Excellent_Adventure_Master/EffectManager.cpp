@@ -6,7 +6,7 @@
 #include <WProgram.h>
 #include "EffectManager.h"
 //#include "TimerOne.h"
-//#define EM_DEBUG_ENABLE
+
 
 #ifdef EM_DEBUG_ENABLE
 #define EM_DEBUG(MSG)  PRINTLN(MSG)
@@ -33,6 +33,10 @@ EffectManager :: EffectManager
     m_currentRing = 0;
     m_currentCall = 0;
     m_currentOver = 0;
+    m_disablePanels = false;
+    m_panelsDisabled = false;
+    m_rebooting = false;
+    m_duration = 0;
     SetMode(EM_MODE_IDLE);
 }
 
@@ -109,11 +113,13 @@ void EffectManager :: SetMode
 
 void EffectManager :: EnableEffects()
 {
+    EM_DEBUG("EM: Enable Effects");
     m_disablePanels = false;
 }
 
 void EffectManager :: DisableEffects()
 {
+    EM_DEBUG("EM: Disable Effects");
     m_disablePanels = true;
 }
 
@@ -137,12 +143,14 @@ unsigned short EffectManager :: GetRandomNumber()
 // repeatedly check the status of the reboot.
 void EffectManager :: RebootPanels()
 {
+    EM_DEBUG("EM: Rebooting");
     m_rebooting = true;
     RebootComplete();
 }
 
 bool EffectManager :: RebootComplete()
 {
+    
     if (m_rebooting)
     {
         if (m_pm->Ready())
@@ -152,6 +160,7 @@ bool EffectManager :: RebootComplete()
                 m_pm->PowerDown();
             } else {
                 m_pm->PowerUp();
+                EM_DEBUG("EM: Reboot is complete.");
                 // Idea: wait another bit before switching mode?
                 m_rebooting = false;
             }
@@ -197,7 +206,7 @@ void EffectManager :: Poll
         default:
             if (m_disablePanels)
             {
-                m_mode = EM_MODE_DISABLE;
+                SetMode(EM_MODE_DISABLE);
                 m_panelsDisabled = false;
             }
             if
@@ -206,9 +215,9 @@ void EffectManager :: Poll
             //||  (ringer & 32)
             )
             {
-                m_mode = EM_MODE_RING;
+                SetMode(EM_MODE_RING);
             } else {
-                m_mode = EM_MODE_IDLE;
+                SetMode(EM_MODE_IDLE);
                 if (switchEffect)
                 {
                     m_currentIdle++;
@@ -221,7 +230,7 @@ void EffectManager :: Poll
             
             if (offHook)
             {
-                m_mode = EM_MODE_CALL;
+                SetMode(EM_MODE_CALL);
             }
             break;
         case EM_MODE_CALL:
@@ -237,11 +246,12 @@ void EffectManager :: Poll
             //currentEffect = m_currentCall;
             if (!offHook)
             {
-                m_mode = EM_MODE_CALLENDED;
+                SetMode(EM_MODE_CALLENDED);
             }
             if ((time - m_duration) > MAX_CALL_DURATION_MS)
             {
-                m_mode = EM_MODE_CALL_OVERTIME;
+                EM_DEBUG("EM: Call went overtime.");
+                SetMode(EM_MODE_CALL_OVERTIME);
             }
             break;
         case EM_MODE_CALL_OVERTIME:
@@ -259,13 +269,13 @@ void EffectManager :: Poll
             //currentEffect = m_currentOver;
             if (!offHook)
             {
-                m_mode = EM_MODE_CALLENDED;
+                SetMode(EM_MODE_CALLENDED);
             }
             break;
         case EM_MODE_CALLENDED_REBOOTED:
             if (RebootComplete())
             {
-                m_mode = EM_MODE_IDLE;
+                SetMode(EM_MODE_IDLE);
             }
             break;
         case EM_MODE_DISABLE_STANDBY:
@@ -273,7 +283,7 @@ void EffectManager :: Poll
             {
                 m_panelsDisabled = false;
                 RebootPanels();
-                m_mode = EM_MODE_CALLENDED_REBOOTED;
+                SetMode(EM_MODE_CALLENDED_REBOOTED);
             }
             
             // Do nothing.
@@ -325,14 +335,14 @@ void EffectManager :: Poll
                 // The call ended, fade those panels out.
                 m_canvas.FadeToBlack();
                 m_pollDelay += EM_FADE_DELAY_MS;
-                m_mode = EM_MODE_CALLENDED_FADE_END;
+                SetMode(EM_MODE_CALLENDED_FADE_END);
                 break;
             case EM_MODE_CALLENDED_FADE_END:
                 EM_DEBUG("POLL, ONCE: FADEEND");
                 // Wait until the power manager is ready, and then
                 // reboot the panels:
                 RebootPanels();
-                m_mode = EM_MODE_CALLENDED_REBOOTED;
+                SetMode(EM_MODE_CALLENDED_REBOOTED);
                 /*if (m_pm->Ready())
                 {
                     if (m_pm->GetPowerStatus() == PM_POWER_ON)
@@ -341,7 +351,7 @@ void EffectManager :: Poll
                     } else {
                         m_pm->PowerUp();
                         // Idea: wait another bit before switching mode?
-                        m_mode = EM_MODE_IDLE;
+                        SetMode(EM_MODE_IDLE);
                     }
                 }*/
                 break;
@@ -350,14 +360,14 @@ void EffectManager :: Poll
                 // Fade out
                 m_canvas.FadeToBlack();
                 m_pollDelay += EM_FADE_DELAY_MS; // 2 seconds delay
-                m_mode = EM_MODE_DISABLE_FADE_END;
+                SetMode(EM_MODE_DISABLE_FADE_END);
                 break;
             case EM_MODE_DISABLE_FADE_END:
                 EM_DEBUG("POLL, ONCE: DISABLE_FADEEND");
                 // We're all faded out, terminate power.  The only way out of 
                 // this mode is a call to EnableEffects().
                 m_pm->PowerDown();
-                m_mode = EM_MODE_DISABLE_STANDBY;
+                SetMode(EM_MODE_DISABLE_STANDBY);
                 break;
             default:
                 break;

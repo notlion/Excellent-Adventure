@@ -74,7 +74,6 @@ class EffectManager
 
     char                                            m_mode;
     char                                            m_modePrevious;
-    bool                                            m_disabled;
     unsigned long                                   m_pollDelay;
     unsigned long                                   m_duration;
     Canvas                                          m_canvas;

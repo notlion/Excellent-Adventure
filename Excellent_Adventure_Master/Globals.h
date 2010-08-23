@@ -10,6 +10,33 @@
 //#define USE_PANEL_SIMULATOR
 
 
+
+// DEBUG enabling:
+
+// Enable debug messages for the effect manager
+#define EM_DEBUG_ENABLE
+
+// Turns off the blittin (will not show anything on panels if you enable
+// this):
+//#define EM_DEBUG_NOBLIT
+
+// Show messages in the SLIC:
+//#define SLIC_DEBUG
+
+// Force the values of the SLIC offhooks:
+
+//#define SLIC_FORCE_LOCAL_OFFHOOK
+//#define SLIC_FORCE_REMOTE_OFFHOOK
+
+//#define SLIC_FORCE_LOCAL_ONHOOK
+//#define SLIC_FORCE_REMOTE_ONHOOK
+
+// This will make the local offhook alternate from offhook to onhook about
+// every 5-10 seconds
+//#define SLIC_DEBUG_OFFON_LOCAL
+
+
+
 #define I2C_RATE                100000
 #define SERIAL_RATE             38400
 
