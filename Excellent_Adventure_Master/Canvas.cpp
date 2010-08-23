@@ -375,7 +375,7 @@ void Canvas :: BlitToPanels()
     
     for (char n = 0, *addr = &ceilingAddresses[0]; n < CEILING_LIGHTS; n++, addr++)
     {
-        Color_t color = m_ceiling[n];
+        ColorCeiling_t color = m_ceiling[n];
         RGB[1] = CEILING_WHITE(color);
         RGB[2] = CEILING_UV(color);
         RGB[3] = 0;
@@ -400,9 +400,9 @@ void Canvas :: Clear
     Color_t                                         color
 )
 {
-#ifdef USE_ARDUINO    
-    memset(&m_canvas[m_who][0], color, sizeof(Color_t)*CANVAS_MEMORY_SIZE);
-#else
+//#ifdef USE_ARDUINO    
+//    memset(&m_canvas[m_who][0], color, sizeof(Color_t)*CANVAS_MEMORY_SIZE);
+//#else
     // For some reason the Maple does not support this *fundamental* function,
     // or I can't find it.
     Color_t *memory =       &m_canvas[m_who][0];
@@ -412,27 +412,27 @@ void Canvas :: Clear
         *(memory++) = color;
     } while (memory != end);
 
-#endif
+//#endif
 }
 
 void Canvas :: ClearCeiling
 (
-    Color_t                                         color
+    ColorCeiling_t                                  color
 )
 {
-#ifdef USE_ARDUINO    
-    memset(&m_ceiling[0], color, sizeof(Color_t)*CEILING_LIGHTS);
-#else
+//#ifdef USE_ARDUINO    
+//    memset(&m_ceiling[0], color, sizeof(ColorCeiling_t)*CEILING_LIGHTS);
+//#else
     // For some reason the Maple does not support this *fundamental* function,
     // or I can't find it.
-    Color_t *memory =       &m_ceiling[0];
-    Color_t *end =          &m_ceiling[CEILING_LIGHTS];
+    ColorCeiling_t *memory =       &m_ceiling[0];
+    ColorCeiling_t *end =          &m_ceiling[CEILING_LIGHTS];
     do
     {
         *(memory++) = color;
     } while (memory != end);
 
-#endif
+//#endif
 }
 
 
