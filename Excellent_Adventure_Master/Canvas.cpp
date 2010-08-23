@@ -371,8 +371,8 @@ void Canvas :: BlitToPanels()
             x++;
         }
     }
+#ifndef CEILING_LIGHTS_DISABLE
     // Send out our ceiling data too:
-    
     for (char n = 0, *addr = &ceilingAddresses[0]; n < CEILING_LIGHTS; n++, addr++)
     {
         ColorCeiling_t color = m_ceiling[n];
@@ -388,6 +388,7 @@ void Canvas :: BlitToPanels()
         I2C_WRITE((unsigned)(*addr), &RGB[0], 4);
 #endif
     }
+#endif
 
 #ifdef BENCHMARK    
     RGB[0] = 254;

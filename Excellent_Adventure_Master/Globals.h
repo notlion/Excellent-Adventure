@@ -12,7 +12,7 @@
 // disable the I2C panel communications.
 #define USE_PANEL_SIMULATOR
 
-
+#define CEILING_LIGHTS_DISABLE
 
 // DEBUG enabling:
 
