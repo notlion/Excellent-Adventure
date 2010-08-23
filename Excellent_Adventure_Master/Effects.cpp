@@ -1,9 +1,8 @@
 #include "EffectManager.h"
 #include "Effects.h"
+#include "EffectUtils.h"
 #include "Canvas.h"
 #include "Spectrum.h"
-#include "Util.h"
-
 
 
 int SimpleSpectrum(Canvas *c, EffectManager *em, char mode)
@@ -82,13 +81,145 @@ int SimpleSpectrum(Canvas *c, EffectManager *em, char mode)
 
         for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
         {
-            c->PutPixel(x,y, (bands[x] > high) ? color : 0);
+            c->PutPixel(x, y, (bands[x + 1] > high) ? color : 0);
         }
     }
     return 1;
 }
 
+int WarpSpectrum(Canvas *c, EffectManager *em, char mode)
+{
+    static uint8_t ci = 0;
+    static unsigned short pos[CANVAS_WIDTH];
+    //static          short vel[CANVAS_WIDTH];
+    
+    static char currentMode = -1;
+    if(mode != currentMode){  // performed only once
+        switch(mode){
+            case EFFECTMODE_INTRO:
+                for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
+                    pos[x] = CANVAS_HM1;
+                    for(uint8_t y = 0; y < CANVAS_HEIGHT; y++)
+                        c->PutPixel(x, y, 0);
+                }
+                break;
+        }
+        currentMode = mode;
+    }
+    else{  // step
+        unsigned short *spectrum = em->GetSpectrum();
+        for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
+            short spc = spectrum[(x >> 1) + 3];
+            if(spc > 800)
+                ci = MOD32(ci + 1);
+            pos[x] -= (spc - 150) * 10;
+        }
+    }
 
+    for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
+        uint8_t px = pos[x] / 6554;
+        for(uint8_t y = 0; y < CANVAS_HEIGHT; y++){
+            if(y == px){  // shot of color
+                c->PutPixel(x, y, lerpColor(c->GetPixel(x, y), colorwheel_lut[ci], 0.5));
+            }
+            else if(y == px - 1 || y == px + 1){  // shot of color
+                c->PutPixel(x, y, lerpColor(c->GetPixel(x, y), colorwheel_lut[ci], 0.1));
+            }
+            else{  // fade out
+                Color_t px_color = c->GetPixel(x, y);
+                c->PutPixel(x, y, COLOR_B(
+                    MAX(0, char(RED(px_color)) - 2),
+                    MAX(0, char(GREEN(px_color)) - 2),
+                    MAX(0, char(BLUE(px_color)) - 2)
+                ));
+            }
+        }
+    }
+    
+    return 1;
+}
+
+int ElevatorSpectrum(Canvas *c, EffectManager *em, char mode)
+{
+    static unsigned short pos = 0;
+    static          short vel = 0;
+    
+    // step
+    unsigned short level = em->GetSpectrum()[4];
+    vel *= 0.95;
+    vel += level;
+    pos -= vel;
+
+    for(uint8_t y = 0; y < CANVAS_HEIGHT; y++){
+        Color_t color;
+        if(vel > 10000){
+            uint8_t cw_pos = (pos + (y << 12)) >> 11;
+            color = colorwheel_lut[cw_pos];
+        }
+        else{
+            uint8_t sin_pos = (pos + (y << 13)) >> 11;  // 65536 -> 32
+            uint8_t gs = sin_lut[sin_pos] >> 3;  // 256 -> 32
+            color = COLOR_B(gs, gs, gs);
+        }
+        for(uint8_t x = 0; x < CANVAS_WIDTH; x++){
+            c->PutPixel(x, y, color);
+        }
+    }
+    
+    return 1;
+}
+
+int PinwheelSpectrum(Canvas *c, EffectManager *em, char mode)
+{
+    static int step = 0;
+    
+    static int ctrx = (CANVAS_WM1 * 100) / 2;
+    static int ctry = (CANVAS_HM1 * 100) / 2;
+    
+    for(char y = 0; y < CANVAS_HEIGHT; y++){
+        for(char x = 0; x < CANVAS_WIDTH; x++){
+            int angle = MOD32(int(atan2(y * 100 - ctry, x * 100 - ctrx) * TWO_PI_TO_32) + step);
+            c->PutPixel(x, y, colorwheel_lut[angle]);
+        }
+    }
+    
+    step += 2;
+}
+
+int SolidColors(Canvas *c, EffectManager *em, char mode)
+{
+    static Color_t color, color_goal;
+    
+    static char currentMode = -1;
+    if(mode != currentMode){  // performed only once
+        switch(mode){
+            case EFFECTMODE_INTRO:
+                color = colorwheel_lut[randInt(32)];
+                color_goal = color;
+                break;
+        }
+        currentMode = mode;
+    }
+    
+    unsigned short *spectrum = em->GetSpectrum();
+    unsigned short spc_max = 0;
+    for(char x = 0; x < CANVAS_WIDTH; x++){
+        unsigned short spc = spectrum[3 + (x >> 1)];
+        spc_max = MAX(spc_max, spc);
+        Color_t px_color = lerpColor(0, color, MIN(1000, spc) / 1000.0f);
+        for(char y = 0; y < CANVAS_HEIGHT; y++){
+            c->PutPixel(x, y, px_color);
+        }
+    }
+    
+    if(spc_max > 1000){
+        color_goal = colorwheel_lut[randInt(32)];
+    }
+    
+    color = lerpColor(color, color_goal, 0.1f);
+
+    return 1;
+}
 
 
 int SimpleColumns(Canvas *c, EffectManager *em, char mode)
@@ -169,19 +300,19 @@ int Spotlight(Canvas *c, EffectManager *em, char mode)
     float blx = sin_lut[MOD32(step + 24)] / 255.0f * CANVAS_WM1;
     float bly = sin_lut[MOD32(step + 16)] / 255.0f * CANVAS_HM1;
     
-    ubyte r, g, b;
+    uint8_t r, g, b;
     for(char y = 0; y < CANVAS_HEIGHT; y++){
         for(char x = 0; x < CANVAS_WIDTH; x++){
-            r = max_f(0.0f, 4.0f - dist(x, y, rlx, rly)) * 0x1F;
-            g = max_f(0.0f, 3.0f - dist(x, y, glx, gly)) * 0x1F;
-            b = max_f(0.0f, 4.0f - dist(x, y, blx, bly)) * 0x1F;
-            c->PutPixel(x, y, COLOR_B(min_ub(r, 0x1F), min_ub(g, 0x1f), min_ub(b, 0x1f)));
+            r = MAX(0.0f, 4.0f - dist(x, y, rlx, rly)) * 0x1F;
+            g = MAX(0.0f, 3.0f - dist(x, y, glx, gly)) * 0x1F;
+            b = MAX(0.0f, 4.0f - dist(x, y, blx, bly)) * 0x1F;
+            c->PutPixel(x, y, COLOR_B(MIN(r, 0x1F), MIN(g, 0x1f), MIN(b, 0x1f)));
         }
     }
     
     step++;
+    
     return 1;
-
 }
 
 int CheckerBoard(Canvas *c, EffectManager *em, char mode)
@@ -190,8 +321,6 @@ int CheckerBoard(Canvas *c, EffectManager *em, char mode)
     static unsigned char offsetX = 0;
 
     static unsigned char offsetY = 0;
-
-    
 
     static Channel_t n = 0;
     static char currentMode = -1;
@@ -242,6 +371,7 @@ int CheckerBoard(Canvas *c, EffectManager *em, char mode)
     return 1;
 }
 
+
 int BlitzyIdle(Canvas *c, EffectManager *em, char mode)
 {
     static bool n = false;
@@ -284,7 +414,8 @@ int RingFlash(Canvas *c, EffectManager *em, char mode)
     return 1;
 }
 
-int Overtime (Canvas *c, EffectManager *em, char mode)
+
+int Overtime(Canvas *c, EffectManager *em, char mode)
 {
     c->ClearCeiling(COLOR_CEILING(0,255));
     c->Clear(0);

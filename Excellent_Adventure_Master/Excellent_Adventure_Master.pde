@@ -5,7 +5,6 @@
    \ \_____\\_____\\ \_\\"\   \ \ \__/".~\\ \_\ \\ \_\ \\_____\\_\ \_\\_\   
     \/_____//_____//_/ \/_/    \/_/   \/_//_/ /_//_/\/_//_____//_/\/_//_/   
 
-
    ---What?---
    Combined "master" firmware for Excellent Adventure.
    Controls LED panels, dumb LEDs, SLIC, and takes analog
@@ -15,9 +14,10 @@
    www.carbonworkshop.com/bm10
 
    ---Who?---
-   Chris Condrat - chris@g6net.com
-   Gustavo Huber - gush@carbonworkshop.com
-   Daniel Massey - pichiste@gmail.com
+   Chris Condrat  - chris@g6net.com
+   Gustavo Huber  - gush@carbonworkshop.com
+   Daniel Massey  - pichiste@gmail.com
+   Ryan Alexander - ryan@onecm.com
 
    ---When?---
    June 11, 2010
@@ -52,9 +52,6 @@
 
 
 
-//
-//  
-//              
 //          +--------+   +--------+ 
 //  Tip ----| SLIC_L |   | SLIC_L |
 //          |        |   |        |
@@ -68,7 +65,6 @@
 //          |                     |
 //          |                     |
 //          +---------------------+
-//
 
 // L = Local; R = Remote
 unsigned long time;
@@ -98,9 +94,9 @@ Effect effectsIdle[EFFECTS_NUM_IDLE] =
     {&BlitzyIdle, 0}
 //    {&SimpleSpectrum, 0}
 //    {&CheckerBoard, 0}
-//    {&SimpleColumns, 0}
+//    {&SimpleSpectrum, 0}
 //    {&Spotlight, 0}
-//,   {&SimpleColumns, 0}
+//    {&SimpleColumns, 0}
 };
 
 Effect effectsRing[EFFECTS_NUM_RING] =
@@ -355,4 +351,3 @@ void PhoneControl(bool offHookLocal, bool offHookRemote)
 
     };
 }
-

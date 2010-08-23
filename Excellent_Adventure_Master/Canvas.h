@@ -117,8 +117,8 @@ typedef unsigned char       Channel_t;
 #define SETBRIGHT(C)        ((C) |= (1 << BRIGHT_SHIFT))
 #define UNSETBRIGHT(C)      ((C) &= ~(1 << BRIGHT_SHIFT))
 
-#define sbi(WHO,C)        ((WHO) |= (1 << (C)))
-#define cbi(WHO,C)        ((WHO) &= ~(1 << (C)))
+#define sbi(WHO,C)          ((WHO) |= (1 << (C)))
+#define cbi(WHO,C)          ((WHO) &= ~(1 << (C)))
 
 // Color to scaled RGB 256 values
 
@@ -138,20 +138,20 @@ typedef unsigned char       Channel_t;
 #define GREEN256(C)     (Channel_t)((((C) >> 3)       & NORMAL_MASK))
 #define BLUE256(C)      (Channel_t)((((C) >> 8)       & NORMAL_MASK))
 
-#define RED256_B(C)     (Channel_t)(((C) << 3)       & BRIGHT_MASK)
-#define GREEN256_B(C)   (Channel_t)(((C) >> 2)       & BRIGHT_MASK)
-#define BLUE256_B(C)    (Channel_t)(((C) >> 7)       & BRIGHT_MASK)
+#define RED256_B(C)     (Channel_t)(((C) << 3)        & BRIGHT_MASK)
+#define GREEN256_B(C)   (Channel_t)(((C) >> 2)        & BRIGHT_MASK)
+#define BLUE256_B(C)    (Channel_t)(((C) >> 7)        & BRIGHT_MASK)
 
 #define CEILING_WHITE(C) (Channel_t)((C)            & CHANNEL_MASK)
 #define CEILING_UV(C)    (Channel_t)(((C) >> 8)     & CHANNEL_MASK)
 
 // Raw 5-bit values
 
-#define RED(C)              (Channel_t)(((C) >> R_SHIFT)    & CHANNEL_MASK)
-#define GREEN(C)            (Channel_t)(((C) >> G_SHIFT)    & CHANNEL_MASK)
-#define BLUE(C)             (Channel_t)(((C) >> B_SHIFT)    & CHANNEL_MASK)
-
-#define IS_BRIGHT(C)        (((C) >> BRIGHT_SHIFT)          & 0x1)
+#define RED(C)          (Channel_t)(((C) >> R_SHIFT)  & CHANNEL_MASK)
+#define GREEN(C)        (Channel_t)(((C) >> G_SHIFT)  & CHANNEL_MASK)
+#define BLUE(C)         (Channel_t)(((C) >> B_SHIFT)  & CHANNEL_MASK)
+                                                      
+#define IS_BRIGHT(C)    (((C) >> BRIGHT_SHIFT)        & 0x1)
 
 // Color0 Color1, Weight, DENOM (as shift)
 #define CHANNEL_LINTERP_DENOM   5

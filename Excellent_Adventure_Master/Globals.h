@@ -186,5 +186,3 @@
 
 // Globals
 #endif
-
-
