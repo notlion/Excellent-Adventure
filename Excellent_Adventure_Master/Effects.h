@@ -8,6 +8,7 @@ int WarpSpectrum     (Canvas *c, EffectManager *em, char mode);
 int PinwheelSpectrum (Canvas *c, EffectManager *em, char mode);
 int ElevatorSpectrum (Canvas *c, EffectManager *em, char mode);
 int SolidColors      (Canvas *c, EffectManager *em, char mode);
+int SolidSpectrum    (Canvas *c, EffectManager *em, char mode);
 
 int SimpleColumns    (Canvas *c, EffectManager *em, char mode);
 int Spotlight        (Canvas *c, EffectManager *em, char mode);
