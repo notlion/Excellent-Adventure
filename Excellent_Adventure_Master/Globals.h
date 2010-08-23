@@ -19,6 +19,7 @@
 // Enable debug messages for the power management
 #define PM_DEBUG_ENABLE
 
+#define PM_DISABLE
 
 // Enable debug messages for the effect manager
 #define EM_DEBUG_ENABLE

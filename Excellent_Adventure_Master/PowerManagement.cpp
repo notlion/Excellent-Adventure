@@ -49,19 +49,27 @@ bool PowerManagement :: GetLowPowerStatus()
 void PowerManagement :: PowerUp()
 {
     PM_DEBUG("PM: PowerUp");
-    digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_DISABLE);
     m_powerStatus = PM_POWER_ON;
+#ifdef PM_DISABLE
+    m_ready = true;
+#else
+    digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_DISABLE);
     m_time = millis();
     m_ready = false;
+#endif
 }
 
 void PowerManagement :: PowerDown()
 {
     PM_DEBUG("PM: PowerDown");
-    digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_ENABLE);
     m_powerStatus = PM_POWER_OFF;
+#ifdef PM_DISABLE
+    m_ready = true;
+#else
+    digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_ENABLE);
     m_time = millis();
     m_ready = false;
+#endif
 }
 
 // The poll function checks the value of the light sensor.  The signal is
@@ -72,6 +80,7 @@ bool PowerManagement :: Poll
     unsigned long                                   time
 )
 {
+#ifndef PM_DISABLE
     if ((time - m_time) > LIGHT_SENSOR_POLLING_MS)
     {
         m_time = time;
@@ -102,7 +111,7 @@ bool PowerManagement :: Poll
             return true;
         }
     }
-
+#endif
     return false;
 }
 
