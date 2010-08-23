@@ -39,14 +39,14 @@ bool PowerManagement :: GetLowPowerStatus()
 
 void PowerManagement :: PowerUp()
 {
-    digitalWrite(BOOTH_PIN_LOW_POWER_EN, HIGH);
+    digitalWrite(BOOTH_PIN_LOW_POWER_EN, LOW);
     m_powerStatus = PM_POWER_ON;
     m_ready = false;
 }
 
 void PowerManagement :: PowerDown()
 {
-    digitalWrite(BOOTH_PIN_LOW_POWER_EN, LOW);
+    digitalWrite(BOOTH_PIN_LOW_POWER_EN, HIGH);
     m_powerStatus = PM_POWER_OFF;
     m_ready = false;
 }
