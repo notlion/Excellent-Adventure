@@ -87,6 +87,7 @@ typedef unsigned char       Channel_t;
 // 0b01111100 --> 0x7C
 #define NORMAL_MASK         0x7C
 #define CHANNEL_MASK        0x1F
+#define CEILING_CHANNEL_MASK 0xFF
 
 #define NORMAL_SCALE        (-2)
 #define BRIGHT_SCALE        (-3)
@@ -142,8 +143,8 @@ typedef unsigned char       Channel_t;
 #define GREEN256_B(C)   (Channel_t)(((C) >> 2)        & BRIGHT_MASK)
 #define BLUE256_B(C)    (Channel_t)(((C) >> 7)        & BRIGHT_MASK)
 
-#define CEILING_WHITE(C) (Channel_t)((C)            & CHANNEL_MASK)
-#define CEILING_UV(C)    (Channel_t)(((C) >> 8)     & CHANNEL_MASK)
+#define CEILING_WHITE(C) (Channel_t)((C)            & CEILING_CHANNEL_MASK)
+#define CEILING_UV(C)    (Channel_t)(((C) >> 8)     & CEILING_CHANNEL_MASK)
 
 // Raw 5-bit values
 

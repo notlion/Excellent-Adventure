@@ -88,6 +88,9 @@
 #define PM_LOW_POWER_SIGNAL_ENABLE      LOW
 #define PM_LOW_POWER_SIGNAL_DISABLE     HIGH
 
+#define LASER_SIGNAL_ENABLE             HIGH
+#define LASER_SIGNAL_DISABLE            LOW
+
 
 // When fading to black, how long to wait until we power down:
 #define EM_FADE_DELAY_MS                2000

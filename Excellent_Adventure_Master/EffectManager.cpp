@@ -62,7 +62,7 @@ void EffectManager :: InitPins()
     pinMode(BOOTH_PIN_LASER, OUTPUT);
 
 
-    digitalWrite(BOOTH_PIN_LASER, LOW);
+    digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_DISABLE);
 }
 
 
@@ -83,7 +83,7 @@ void EffectManager :: PulseLaser()
     if (m_pm->GetLowPowerStatus() == PM_LOW_POWER_MODE_OFF)
     {
         m_laserOn = true;
-        digitalWrite(BOOTH_PIN_LASER, HIGH);
+        digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_ENABLE);
     }
 }
 
@@ -92,7 +92,7 @@ void EffectManager :: LaserOff()
     if (m_laserOn)
     {
         m_laserOn = false;
-        digitalWrite(BOOTH_PIN_LASER, LOW);
+        digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_DISABLE);
     }
 }
 
