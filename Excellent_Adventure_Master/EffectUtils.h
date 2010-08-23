@@ -28,7 +28,7 @@ static Color_t colorwheel_lut[] =
 
 int distInt(int x1, int y1, int x2, int y2)
 {
-    int xo = (x2 - x1) * 1.666666f;
+    int xo = (x2 - x1) * 1.666666;
     int yo = y2 - y1;
     return sqrt(xo * xo + yo * yo);
 }

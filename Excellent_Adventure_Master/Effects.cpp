@@ -260,22 +260,24 @@ int SpotlightSpectrum(Canvas *c, EffectManager *em, char mode)
 {
     static int step = 0;
     
-    float rlx = sin_lut[MOD32(step + 8)] / 255.0f * CANVAS_WM1;
-    float rly = sin_lut[MOD32(step)] / 255.0f * CANVAS_HM1;
+    unsigned short rlx = sin_lut[MOD32(step + 8)] * CANVAS_WM1;
+    unsigned short rly = sin_lut[MOD32(step)]     * CANVAS_HM1;
     
-    float glx = sin_lut[MOD32(-step + 8)] / 255.0f * CANVAS_WM1;
-    float gly = sin_lut[MOD32(-step)] / 255.0f * CANVAS_HM1;
+    unsigned short glx = sin_lut[MOD32(-step + 8)] * CANVAS_WM1;
+    unsigned short gly = sin_lut[MOD32(-step)]     * CANVAS_HM1;
     
-    float blx = sin_lut[MOD32(step + 24)] / 255.0f * CANVAS_WM1;
-    float bly = sin_lut[MOD32(step + 16)] / 255.0f * CANVAS_HM1;
+    unsigned short blx = sin_lut[MOD32(step + 24)] * CANVAS_WM1;
+    unsigned short bly = sin_lut[MOD32(step + 16)] * CANVAS_HM1;
     
     uint8_t r, g, b;
     for(char y = 0; y < CANVAS_HEIGHT; y++){
         for(char x = 0; x < CANVAS_WIDTH; x++){
-            r = MAX(0.0f, 4.0f - dist(x, y, rlx, rly)) * 0x1F;
-            g = MAX(0.0f, 3.0f - dist(x, y, glx, gly)) * 0x1F;
-            b = MAX(0.0f, 4.0f - dist(x, y, blx, bly)) * 0x1F;
-            c->PutPixel(x, y, COLOR_B(MIN(r, 0x1F), MIN(g, 0x1f), MIN(b, 0x1f)));
+            unsigned short xi = x << 8;  // * 256
+            unsigned short yi = y << 8;  // * 256
+            r = MAX(0, (4 << 8) - distInt(xi, yi, rlx, rly)) >> 3;
+            g = MAX(0, (3 << 8) - distInt(xi, yi, glx, gly)) >> 3;
+            b = MAX(0, (4 << 8) - distInt(xi, yi, blx, bly)) >> 3;
+            c->PutPixel(x, y, COLOR_B(MIN(r, 31), MIN(g, 31), MIN(b, 31)));
         }
     }
     
