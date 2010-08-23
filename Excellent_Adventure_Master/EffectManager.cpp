@@ -19,6 +19,9 @@
     currentEffect = (CURRENT_EFFECT);                                       \
     runEffects = true;
 
+
+//#define EM_DEBUG_NOBLIT
+
 EffectManager :: EffectManager
 (
     PowerManagement                             *   pm
@@ -168,15 +171,15 @@ void EffectManager :: Poll
 
 
 
-    EM_DEBUG("BEGIN POLL");
     static bool runEffects = false;
     static unsigned short effectCount = 0;
-    EM_DEBUG(effectCount);
    
     
 
     if ((time - m_pollDelay) > EFFECT_POLL_DELAY_MS)
     {
+        //EM_DEBUG("BEGIN POLL");
+        //EM_DEBUG(effectCount);
         //static int ringer = 0;
         //ringer++;
         
@@ -229,7 +232,7 @@ void EffectManager :: Poll
                 {
                     m_currentCall = 0;
                 }
-                effectCount = 4096 + (GetRandomNumber() >> 4);
+                effectCount = 2048 + (GetRandomNumber() >> 5);
             }
             //currentEffect = m_currentCall;
             if (!offHook)
@@ -363,14 +366,18 @@ void EffectManager :: Poll
         }
         if (runEffects)
         {
-            EM_DEBUG("runEffects");
+            //EM_DEBUG("runEffects");
             //EM_DEBUG((int)(*currentEffect));
             //EM_DEBUG("ringer");
             //EM_DEBUG((int)(ringer));
             m_spectrum.ReadSpectrum();
             Effect *theEffect = (effects + (*currentEffect));
             theEffect->func(&m_canvas, const_cast<EffectManager *>(this), EFFECTMODE_LOOP);
+#ifdef EM_DEBUG_NOBLIT
+            //EM_DEBUG("BLIT!");
+#else
             m_canvas.BlitToPanels();
+#endif
         }
         if (effectCount > 0)
         {
