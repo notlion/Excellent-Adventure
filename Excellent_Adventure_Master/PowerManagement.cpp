@@ -41,6 +41,7 @@ void PowerManagement :: PowerUp()
 {
     digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_DISABLE);
     m_powerStatus = PM_POWER_ON;
+    m_time = millis();
     m_ready = false;
 }
 
@@ -48,6 +49,7 @@ void PowerManagement :: PowerDown()
 {
     digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_ENABLE);
     m_powerStatus = PM_POWER_OFF;
+    m_time = millis();
     m_ready = false;
 }
 

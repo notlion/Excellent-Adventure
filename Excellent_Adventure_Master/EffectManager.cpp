@@ -15,9 +15,9 @@
 #endif
 
 #define SET_EFFECT(EFFECT,CURRENT_EFFECT)                                   \
-    effects = (EFFECT);                                                     \
-    currentEffect = (CURRENT_EFFECT);                                       \
     runEffects = true;
+//    effects = (EFFECT);                                                     \
+//    currentEffect = (CURRENT_EFFECT);                                       \
 
 
 //#define EM_DEBUG_NOBLIT
@@ -62,7 +62,7 @@ void EffectManager :: InitPins()
     pinMode(BOOTH_PIN_LASER, OUTPUT);
 
 
-    digitalWrite(BOOTH_PIN_LASER, LOW);
+    digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_DISABLE);
 }
 
 
@@ -80,10 +80,10 @@ void EffectManager :: InitSpectrum()
 
 void EffectManager :: PulseLaser()
 {
-    if (m_pm->GetLowPowerStatus() == PM_LOW_POWER_MODE_OFF)
+    if (!m_panelsDisabled)
     {
         m_laserOn = true;
-        digitalWrite(BOOTH_PIN_LASER, HIGH);
+        digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_ENABLE);
     }
 }
 
@@ -92,7 +92,7 @@ void EffectManager :: LaserOff()
     if (m_laserOn)
     {
         m_laserOn = false;
-        digitalWrite(BOOTH_PIN_LASER, LOW);
+        digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_DISABLE);
     }
 }
 
@@ -195,19 +195,12 @@ void EffectManager :: Poll
     bool                                            offHook
 )
 {
-
-
-
     static bool runEffects = false;
     static unsigned short effectCount = 0;
-   
-    
-
+    static bool laserMode = false;
     if ((time - m_pollDelay) > EFFECT_POLL_DELAY_MS)
     {
         LaserOff();
-
-        static bool laserMode = false;
         
         //EM_DEBUG("BEGIN POLL");
         //EM_DEBUG(effectCount);
@@ -218,9 +211,9 @@ void EffectManager :: Poll
         bool switchEffect = (effectCount == 0);
 
         // Which index are we in the array of effects for this mode:
-        static char *currentEffect; // 0 in case it is not specified
+        //static char *currentEffect; // 0 in case it is not specified
 
-        static Effect * effects;
+        //static Effect * effects;
         switch (m_mode)
         {
         case EM_MODE_RING:
@@ -411,13 +404,33 @@ void EffectManager :: Poll
         }
         if (runEffects)
         {
+            Effect *effect;
+            switch(m_mode)
+            {
+            case EM_MODE_IDLE:
+                effect = &m_effectsIdle[m_currentIdle];
+                break;
+            case EM_MODE_RING:
+                effect = &m_effectsRing[m_currentRing];
+                break;
+            case EM_MODE_CALL:
+                effect = &m_effectsCall[m_currentCall];
+                break;
+            case EM_MODE_CALL_OVERTIME:
+                effect = &m_effectsOver[m_currentOver];
+                break;
+            default:
+                EM_DEBUG("EM: ERROR MODE");
+                break;
+            }
+            
             //EM_DEBUG("runEffects");
             //EM_DEBUG((int)(*currentEffect));
             //EM_DEBUG("ringer");
             //EM_DEBUG((int)(ringer));
             m_spectrum.ReadSpectrum();
-            Effect *theEffect = (effects + (*currentEffect));
-            theEffect->func(&m_canvas, const_cast<EffectManager *>(this), EFFECTMODE_LOOP);
+            //Effect *theEffect = (effects + (*currentEffect));
+            effect->func(&m_canvas, const_cast<EffectManager *>(this), EFFECTMODE_LOOP);
 #ifdef EM_DEBUG_NOBLIT
             //EM_DEBUG("BLIT!");
 #else

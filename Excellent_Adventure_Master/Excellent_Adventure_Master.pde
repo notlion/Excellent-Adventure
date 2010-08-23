@@ -92,6 +92,7 @@ void setup()
 
 #ifdef USE_UART
     SERIAL.begin(SERIAL_RATE);
+    PRINTLN("START");
 #endif
 
     EM.AddEffectsArrays
@@ -172,22 +173,22 @@ void PhoneControl(bool offHookLocal, bool offHookRemote)
         switch (debugState)
         {
         case STATE_IDLE:
-            PRINT("State: IDLE");
+            PRINT("MAIN: State: IDLE");
             break;
         case STATE_RING:
-            PRINT("State: RING");
+            PRINT("MAIN: State: RING");
             break;
         case STATE_CALL:
-            PRINT("State: CALL");
+            PRINT("MAIN: State: CALL");
             break;
         case STATE_CALLENDED:
-            PRINT("State: CALL ENDED");
+            PRINT("MAIN: State: CALL ENDED");
             break;
         case -1:
-            PRINT("State: INIT");
+            PRINT("MAIN: State: INIT");
             break;
         default:
-            PRINT("State: UNKNOWN val = ");
+            PRINT("MAIN: State: UNKNOWN val = ");
             PRINT((int)debugState);
             break;
         }

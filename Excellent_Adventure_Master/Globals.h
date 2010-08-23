@@ -11,7 +11,7 @@
 
 // You must enable the UART to use the simulator.  Using the simulator will
 // disable the I2C panel communications.
-#define USE_PANEL_SIMULATOR
+//#define USE_PANEL_SIMULATOR
 
 
 
@@ -88,6 +88,9 @@
 
 #define PM_LOW_POWER_SIGNAL_ENABLE      LOW
 #define PM_LOW_POWER_SIGNAL_DISABLE     HIGH
+
+#define LASER_SIGNAL_ENABLE             HIGH
+#define LASER_SIGNAL_DISABLE            LOW
 
 
 // When fading to black, how long to wait until we power down:
