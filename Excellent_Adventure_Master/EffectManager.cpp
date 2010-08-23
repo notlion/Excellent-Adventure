@@ -353,8 +353,8 @@ void EffectManager :: Poll
                 SET_EFFECT(m_effectsRing, &m_currentRing);
                 break;
             case EM_MODE_CALL:
-                LaserOff();
                 EM_DEBUG("EM:   State: CALL");
+                LaserOff();
                 // The current time so we can shut down the effects if the
                 // person is taking too long
                 m_duration = time;
@@ -363,8 +363,8 @@ void EffectManager :: Poll
                 SET_EFFECT(m_effectsCall, &m_currentCall);
                 break;               
             case EM_MODE_CALL_OVERTIME:
-                LaserOff();
                 EM_DEBUG("EM:   State: OVER");
+                LaserOff();
                 // The current time so we can shut down the effects if the
                 // person is taking too long
                 effectCount = 0;
