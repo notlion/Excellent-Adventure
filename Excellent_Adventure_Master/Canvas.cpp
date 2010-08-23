@@ -316,12 +316,12 @@ void Canvas :: BlitToPanels()
 #endif
 
 #ifdef USE_PANEL_SIMULATOR
-#ifdef USE_UART
+//#ifdef USE_UART
     // This is a sync frame:
 
     RGB[0] = RGB[1] = RGB[2] = RGB[3] = 0xFF;
     SERIAL_WRITE(RGB, 4);
-#endif
+//#endif
 #else
     // Sets the color immediately ('n')
     // Fade to color ('c')
@@ -357,13 +357,13 @@ void Canvas :: BlitToPanels()
                 //    RGB[3] = BLUE256(color);
                 //}
 #ifdef USE_PANEL_SIMULATOR
-#ifdef USE_UART
+//#ifdef USE_UART
                 RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
                 SERIAL_WRITE(RGB, 4);
-#endif
+//#endif
 #else
                 
-                I2C_WRITE((unsigned)(*addr), &RGB[0], 4);
+                I2C_WRITE((unsigned)(*addr), RGB, 4);
 #endif
 
             }
@@ -371,8 +371,8 @@ void Canvas :: BlitToPanels()
             x++;
         }
     }
+#ifndef CEILING_LIGHTS_DISABLE
     // Send out our ceiling data too:
-    
     for (char n = 0, *addr = &ceilingAddresses[0]; n < CEILING_LIGHTS; n++, addr++)
     {
         ColorCeiling_t color = m_ceiling[n];
@@ -380,14 +380,15 @@ void Canvas :: BlitToPanels()
         RGB[2] = CEILING_UV(color);
         RGB[3] = 0;
 #ifdef USE_PANEL_SIMULATOR
-#ifdef USE_UART
+//#ifdef USE_UART
         RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
         SERIAL_WRITE(RGB, 4);
-#endif
+//#endif
 #else
-        I2C_WRITE((unsigned)(*addr), &RGB[0], 4);
+        I2C_WRITE((unsigned)(*addr), RGB, 4);
 #endif
     }
+#endif
 
 #ifdef BENCHMARK    
     RGB[0] = 254;
