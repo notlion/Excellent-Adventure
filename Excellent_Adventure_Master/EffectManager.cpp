@@ -84,14 +84,14 @@ void EffectManager :: LaserOn()
     if (!m_panelsDisabled)
     {
         m_laserOn = true;
-        EM_DEBUG("EM: Laser ON");
+        EM_DEBUG("EM:   Laser ON");
     }
 }
 
 void EffectManager :: LaserOff()
 {
     m_laserOn = false;
-    EM_DEBUG("EM: Laser OFF");
+    EM_DEBUG("EM:   Laser OFF");
     digitalWrite(BOOTH_PIN_LASER, LASER_SIGNAL_DISABLE);
 }
 
