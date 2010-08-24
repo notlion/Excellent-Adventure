@@ -361,9 +361,14 @@ void Canvas :: BlitToPanels()
                 RGB[0] = (unsigned)(*addr); //((x == 0) && (y == 0)) ? 1 : 0;
                 SERIAL_WRITE(RGB, 4);
 //#endif
-#else
-                
-                I2C_WRITE((unsigned)(*addr), RGB, 4);
+#else               
+                //I2C_WRITE((unsigned)(*addr), RGB, 4);
+                I2C_BEGIN_TRANSMISSION(*addr);
+                I2C_WRITE1(RGB[0]);
+                I2C_WRITE1(RGB[1]);
+                I2C_WRITE1(RGB[2]);
+                I2C_WRITE1(RGB[3]);
+                I2C_END_TRANSMISSION;
 #endif
 
             }
@@ -385,7 +390,13 @@ void Canvas :: BlitToPanels()
         SERIAL_WRITE(RGB, 4);
 //#endif
 #else
-        I2C_WRITE((unsigned)(*addr), RGB, 4);
+        //I2C_WRITE((unsigned)(*addr), RGB, 4);
+        I2C_BEGIN_TRANSMISSION(*addr);
+        I2C_WRITE1(RGB[0]);
+        I2C_WRITE1(RGB[1]);
+        I2C_WRITE1(RGB[2]);
+        I2C_WRITE1(RGB[3]);
+        I2C_END_TRANSMISSION;
 #endif
     }
 #endif
