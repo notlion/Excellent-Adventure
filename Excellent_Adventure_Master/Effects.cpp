@@ -12,6 +12,8 @@
 #define MIN(a,b) (a) < (b) ? (a) : (b)
 #endif
 
+#define MAX31(V)  MAX((V),31)
+
 int SimpleSpectrum(Canvas *c, EffectManager *em, char mode)
 {
     static unsigned n = 0;
@@ -555,19 +557,61 @@ int Overtime(Canvas *c, EffectManager *em, char mode)
 int Glitz(Canvas *c, EffectManager *em, char mode)
 {
     static char bgColor = 0;
-    static char yOffSet = 0;
+    static char yOffset = 0;
 
     Color_t bgRaw = colorwheel_lut[bgColor & 31];
 
     Channel_t bgR = RED(bgRaw) << 3;
     Channel_t bgG = GREEN(bgRaw) << 3;
     Channel_t bgB = BLUE(bgRaw) << 3;
-    yOffSet++;
+    yOffset++;
     bgColor++;
 
     for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
     {
-        Channel_t sin = sin_lut[((y << 1)+yOffSet) & 31];
+        Channel_t sin = sin_lut[((y << 1)+yOffset) & 31];
+        
+        Channel_t r = MAX((char)(bgR - sin), 0);
+        Channel_t g = MAX((char)(bgG - sin), 0);
+        Channel_t b = MAX((char)(bgB - sin), 0);
+        Color_t color = COLOR_B(r, g, b);
+
+        //Color_t rowBG = COLOR_B(r, g, b);
+
+        for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
+        {
+            //Color_t rowBG = colorwheel_lut[(yOffset+y+x) & 31];
+            //Channel_t r = MAX((char)(bgR >> (y >> 2)), 0);
+            //Channel_t g = MAX((char)(bgG >> (y >> 2)), 0);
+            //Channel_t b = MAX((char)(bgB >> (y >> 2)), 0);
+            unsigned short r = em->GetRandomNumber();
+            if (r < 1024)
+            {
+                c->PutPixel(x,y, COLOR_WHITE);
+            }else {
+                c->PutPixel(x,y, color);
+            }
+        }
+        
+    }   
+}
+
+int Barrel(Canvas *c, EffectManager *em, char mode)
+{
+    static char bgColor = 0;
+    static char yOffset = 0;
+
+    Color_t bgRaw = colorwheel_lut[bgColor & 31];
+
+    Channel_t bgR = RED(bgRaw) << 3;
+    Channel_t bgG = GREEN(bgRaw) << 3;
+    Channel_t bgB = BLUE(bgRaw) << 3;
+    yOffset++;
+    bgColor++;
+
+    for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
+    {
+        Channel_t sin = sin_lut[((y << 1)+yOffset) & 31];
         
         Channel_t r = MAX((char)(bgR - sin), 0);
         Channel_t g = MAX((char)(bgG - sin), 0);
@@ -589,7 +633,8 @@ int Glitz(Canvas *c, EffectManager *em, char mode)
     }   
 }
 
-int Barrel(Canvas *c, EffectManager *em, char mode)
+
+int SoulWavesVertical(Canvas *c, EffectManager *em, char mode)
 {
     static char bgColor = 0;
     static char yOffset = 0;
@@ -631,22 +676,87 @@ int Barrel(Canvas *c, EffectManager *em, char mode)
 }
 
 
-int SoothingRiser(Canvas *c, EffectManager *em, char mode)
+
+
+int TheCMYKShuffle(Canvas *c, EffectManager *em, char mode)
 {
     static char bgColor = 0;
-    static char yOffSet = 0;
+    static char bgColor2 = 0;
+    static char xOffset = 0;
+    static char yOffset = 0;
 
     Color_t bgRaw = colorwheel_lut[bgColor & 31];
 
     Channel_t bgR = RED(bgRaw) << 3;
     Channel_t bgG = GREEN(bgRaw) << 3;
     Channel_t bgB = BLUE(bgRaw) << 3;
-    yOffSet++;
+
+    Color_t bgRaw2 = colorwheel_lut[bgColor2 & 31];
+
+    Channel_t bgR2 = RED(bgRaw2) << 3;
+    Channel_t bgG2 = GREEN(bgRaw2) << 3;
+    Channel_t bgB2 = BLUE(bgRaw2) << 3;
+
+    xOffset++;
+    bgColor++;
+
+    if (xOffset & 1)
+    {
+        bgColor2++;
+    }
+
+    if ((xOffset & 3) == 0)
+    {
+        yOffset++;
+    }
+
+    for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
+    {
+        Channel_t sin = sin_lut[((y << 3)+yOffset) & 31];
+        
+
+        //Color_t rowBG = COLOR_B(r, g, b);
+        
+        for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
+        {
+            Channel_t sin2 = sin_lut[((x << 3)+xOffset+4) & 31];
+
+            Channel_t r = MAX(bgR - sin2, 0) >> 3;
+            Channel_t g = MAX(bgG - sin2, 0) >> 3;
+            Channel_t b = MAX(bgB - sin2, 0) >> 3;
+            
+            Channel_t r2 = MAX(bgR2 - sin, 0) >> 3;
+            Channel_t g2 = MAX(bgG2 - sin, 0) >> 3;
+            Channel_t b2 = MAX(bgB2 - sin, 0) >> 3;
+            Color_t color = COLOR( MAX31(r + r2), MAX31(g + g2), MAX31(b + b2));
+            if (color == COLOR_WHITE)
+            { 
+                c->PutPixel(x,y, 0);
+            } else {
+                c->PutPixel(x,y, color);
+            }
+        }
+        
+    }   
+}
+
+
+int SoothingRiser(Canvas *c, EffectManager *em, char mode)
+{
+    static char bgColor = 0;
+    static char yOffset = 0;
+
+    Color_t bgRaw = colorwheel_lut[bgColor & 31];
+
+    Channel_t bgR = RED(bgRaw) << 3;
+    Channel_t bgG = GREEN(bgRaw) << 3;
+    Channel_t bgB = BLUE(bgRaw) << 3;
+    yOffset++;
     bgColor++;
 
     for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
     {
-        Channel_t sin = sin_lut[((y << 1)+yOffSet+4) & 31];
+        Channel_t sin = sin_lut[((y << 1)+yOffset+4) & 31];
         
         Channel_t r = MAX(bgR - sin, 0) >> 3;
         Channel_t g = MAX(bgG - sin, 0) >> 3;

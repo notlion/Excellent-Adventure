@@ -43,7 +43,7 @@ struct Effect
                                                         EffectManager *,
                                                         char
                                                     );
-    int                                             flags;
+    int                                             duration;
 };
 
 
