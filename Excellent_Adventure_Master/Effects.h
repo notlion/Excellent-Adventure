@@ -53,8 +53,8 @@ static Effect effectsRing[EFFECTS_NUM_RING] =
 
 static Effect effectsCall[EFFECTS_NUM_CALL] =
 {
-    {&SpotlightSpectrum, 0}
-//     {&CheckerBoard, 0}
+//    {&SpotlightSpectrum, 0}
+     {&CheckerBoard, 0}
 // ,   {&Spotlight, 0}
 // ,   {&WarpSpectrum, 0}
 // ,   {&ElevatorSpectrum, 0}

@@ -453,23 +453,43 @@ void Canvas :: FadeToBlack()
 {
 
 
-    unsigned char data[4];
+
+
+    //unsigned char data[4];
 
     // Stop all scripts
-    data[0] = 'o';
-    I2C_WRITE(ADDR_ALL_PIXELS, data, 1);
+    //data[0] = 'o';
+    //I2C_WRITE(ADDR_ALL_PIXELS, data, 1);
+
+    I2C_BEGIN_TRANSMISSION(ADDR_ALL_PIXELS);
+    I2C_WRITE1('o');
+    I2C_END_TRANSMISSION;
 
     // Set fade speed
-    data[0] = 'f';
-    data[1] = 16;
-    I2C_WRITE(ADDR_ALL_PIXELS, data, 2);
+    //data[0] = 'f';
+    //data[1] = 16;
+    //I2C_WRITE(ADDR_ALL_PIXELS, data, 2);
+
+    I2C_BEGIN_TRANSMISSION(ADDR_ALL_PIXELS);
+    I2C_WRITE1('f');
+    I2C_WRITE1(50);
+    I2C_END_TRANSMISSION;
+
 
     // Fade to black
-    data[0] = 'c';
-    data[1] = 0;
-    data[2] = 0;
-    data[3] = 0;
-    I2C_WRITE(ADDR_ALL_PIXELS, data, 4);
+    //data[0] = 'c';
+    //data[1] = 0;
+    //data[2] = 0;
+    //data[3] = 0;
+    //I2C_WRITE(ADDR_ALL_PIXELS, data, 4);
+
+    I2C_BEGIN_TRANSMISSION(ADDR_ALL_PIXELS);
+    I2C_WRITE1('c');
+    I2C_WRITE1(0);
+    I2C_WRITE1(0);
+    I2C_WRITE1(0);
+    I2C_END_TRANSMISSION;
+
 }
 
 

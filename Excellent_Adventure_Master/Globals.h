@@ -15,7 +15,7 @@
 
 //#define CEILING_LIGHTS_DISABLE
 
-//#define PM_DISABLE
+#define PM_DISABLE
 
 
 // DEBUG enabling:
