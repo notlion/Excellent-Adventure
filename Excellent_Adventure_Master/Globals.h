@@ -35,8 +35,9 @@
 // Show messages in the SLIC:
 #define SC_DEBUG_ENABLE
 
+#define PM_POWER_UP_DELAY_MS            1024
 
-
+#define WATCHDOG_PERIOD_MS              8192
 
 // Force the values of the SLIC offhooks:
 

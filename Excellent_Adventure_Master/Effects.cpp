@@ -543,3 +543,42 @@ int Overtime(Canvas *c, EffectManager *em, char mode)
     c->Clear(0);
     return 1;
 }
+
+
+
+int LightTornado(Canvas *c, EffectManager *em, char mode)
+{
+    static char xOffset = 0;
+    static char yOffset = 0;
+
+    static char bgColor = 0;
+    Color_t bg = colorwheel_lut[bgColor];
+    Channel_t bgR = RED(bg);
+    Channel_t bgG = GREEN(bg);
+    Channel_t bgB = BLUE(bg);
+    
+    yOffset++;
+    xOffset++;
+
+    for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
+    {
+        Channel_t r = (bgR + y) & CHANNEL_MASK;
+        Channel_t g = (bgG + y) & CHANNEL_MASK;
+        Channel_t b = (bgB + y) & CHANNEL_MASK;
+
+        Color_t rowBG = COLOR_B(r, g, b);
+
+        for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
+        {
+            char n = (x + y + xOffset + yOffset) & 3;
+            if (n == 0)
+            { 
+                c->PutPixel(x,y, COLOR_WHITE);
+            } else {
+                c->PutPixel(x,y, rowBG);
+            }
+        }
+        
+    }
+
+}

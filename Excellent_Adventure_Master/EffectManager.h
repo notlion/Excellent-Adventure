@@ -57,6 +57,7 @@ class EffectManager
     Effect                                      *   m_effectsOver;
 
     bool                                            m_rebooting;
+    bool                                            m_rebootingPowerUp;
 
     char                                            m_sizeIdle;
     char                                            m_currentIdle;

@@ -40,6 +40,7 @@ EffectManager :: EffectManager
     m_disablePanels = false;
     m_panelsDisabled = false;
     m_rebooting = false;
+    m_rebootingPowerUp = false;
     m_duration = 0;
     SetMode(EM_MODE_IDLE);
 }
@@ -188,9 +189,10 @@ unsigned short EffectManager :: GetRandomNumber()
 // repeatedly check the status of the reboot.
 void EffectManager :: RebootPanels()
 {
-    EM_DEBUG("EM:   Rebooting panels...");
+    EM_DEBUG("EM:   Rebooting panels... powering down.");
     m_rebooting = true;
-    RebootComplete();
+    m_rebootingPowerUp = false;
+    m_pm->PowerDown();
 }
 
 bool EffectManager :: RebootComplete()
@@ -200,10 +202,11 @@ bool EffectManager :: RebootComplete()
     {
         if (m_pm->Ready())
         {
-            if (m_pm->GetPowerStatus() == PM_POWER_ON)
+            if (!m_rebootingPowerUp)
             {
-                m_pm->PowerDown();
-            } else {
+                EM_DEBUG("EM:   Rebooting panels... powering up.");
+                m_rebootingPowerUp = true;
+            } else {           
                 m_pm->PowerUp();
                 EM_DEBUG("EM:   Reboot complete!");
                 // Idea: wait another bit before switching mode?
@@ -346,6 +349,7 @@ void EffectManager :: Poll
             case EM_MODE_IDLE:
                 EM_DEBUG("EM:   State: IDLE");
                 LaserOff();
+                m_canvas.ClearCeiling(0);
                 SET_EFFECT(m_effectsIdle, &m_currentIdle);
                 break;
             case EM_MODE_RING:
@@ -366,6 +370,7 @@ void EffectManager :: Poll
                 m_duration = time;
                 effectCount = 0;
                 // Restore the lights!
+                m_canvas.ClearCeiling(0);
                 SET_EFFECT(m_effectsCall, &m_currentCall);
                 break;               
             case EM_MODE_CALL_OVERTIME:

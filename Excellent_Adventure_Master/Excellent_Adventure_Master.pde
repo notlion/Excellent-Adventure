@@ -32,6 +32,8 @@
 
 
 #define DEBUG
+#define WATCHDOG_ENABLED
+
 
 #include "EffectManager.h"
 #include "Slic.h"
@@ -80,6 +82,9 @@ char state;
 char debugState;
 #endif
 
+#ifdef WATCHDOG_ENABLED
+unsigned long watchdogTime0;
+#endif
 PowerManagement     PM;
 EffectManager       EM(&PM);
 SLICControl         SC;
@@ -118,6 +123,10 @@ void setup()
     pinMode(BLINK_PIN, OUTPUT);
     blinkTime0 = time;
 #endif
+
+#ifdef WATCHDOG_ENABLED
+    watchdogTime0 = time;
+#endif
     //EM.InstallAnimator();
 }
 
@@ -151,6 +160,18 @@ void loop()
     }
     EM.Poll(time, offHookLocal);
     PhoneControl(offHookLocal, offHookRemote);
+
+#ifdef WATCHDOG_ENABLED
+
+    if ((time - watchdogTime0) > WATCHDOG_PERIOD_MS)
+    {
+        watchdogTime0 = time;
+        PRINT("* time: ");
+        PRINTLN((unsigned long) time);
+    }
+
+
+#endif
 #ifdef BLINK_ENABLED
     if ((time - blinkTime0) > BLINK_MS)
     {

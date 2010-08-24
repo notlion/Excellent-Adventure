@@ -161,6 +161,8 @@ typedef unsigned char       Channel_t;
 #define CHANNEL_LINTERP_DENOM   5
 #define CHANNEL_LINTERP(C0,C1,W) ((int)((int)((int)(C1-C0)*W) >> CHANNEL_LINTERP_DENOM) + C0)
 
+#define COLOR_WHITE     0x7FFF
+
 class Canvas
 {
 

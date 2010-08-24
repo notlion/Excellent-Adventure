@@ -23,7 +23,7 @@ int SpotlightSpectrum (Canvas *c, EffectManager *em, char mode);
 int SimpleColumns     (Canvas *c, EffectManager *em, char mode);
 int Spotlight         (Canvas *c, EffectManager *em, char mode);
 int CheckerBoard      (Canvas *c, EffectManager *em, char mode);
-                      
+int LightTornado      (Canvas *c, EffectManager *em, char mode);
 
 // Overtime effects
 // What to do when people have taken too long

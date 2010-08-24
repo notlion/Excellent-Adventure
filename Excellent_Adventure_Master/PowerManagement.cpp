@@ -54,7 +54,7 @@ void PowerManagement :: PowerUp()
     m_ready = true;
 #else
     digitalWrite(BOOTH_PIN_LOW_POWER_EN, PM_LOW_POWER_SIGNAL_DISABLE);
-    m_time = millis();
+    m_time = millis() + PM_POWER_UP_DELAY_MS;
     m_ready = false;
 #endif
 }
