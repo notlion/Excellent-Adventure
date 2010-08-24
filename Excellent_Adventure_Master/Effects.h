@@ -24,13 +24,12 @@ NEWEFFECT( SimpleColumns        );
 NEWEFFECT( Spotlight            );
 NEWEFFECT( CheckerBoard         );
 NEWEFFECT( Glitz                );
-NEWEFFECT( Barrel               );
 NEWEFFECT( LightTornado         );
 NEWEFFECT( SoothingRiser        );
 NEWEFFECT( SoulWavesVertical    );
 NEWEFFECT( TheCMYKShuffle       );
-NEWEFFECT( Barrel               );
 NEWEFFECT( Accumulator          );
+NEWEFFECT( Old16Colors          );
 
 NEWEFFECT( Overtime             );
 
@@ -104,7 +103,7 @@ static Effect effectsCall[EFFECTS_NUM_CALL] =
     EFFECT(SpotlightSpectrum, 256),
 // EFFECT(Barrel, 64),
     EFFECT(WarpSpectrum, 256),
-// EFFECT( CheckerBoard , 64)
+// EFFECT(CheckerBoard, 64),
 // EFFECT(SoothingRiser, 64),
     EFFECT(ElevatorSpectrum, 256),
     EFFECT(LightTornado, 32),
@@ -117,7 +116,7 @@ static Effect effectsCall[EFFECTS_NUM_CALL] =
 
 static Effect effectsOver[EFFECTS_NUM_OVER] =
 { 
-    EFFECT( Overtime , 64)
+    EFFECT(Overtime , 64)
 };
 
 
