@@ -51,10 +51,10 @@
 // every 5-10 seconds
 //#define SLIC_DEBUG_OFFON_LOCAL
 
-#define EM_LASER_CALL_COUNT             128
+#define EM_LASER_CALL_COUNT             1024
 
 
-#define LASER_TIME_ON_MS                512
+#define LASER_TIME_ON_MS                7000
 #define LASER_TIME_OFF_MS               128
 
 

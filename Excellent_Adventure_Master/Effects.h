@@ -4,35 +4,35 @@
 
 #define NEWEFFECT(NAME) int NAME (Canvas *c, EffectManager *em, char mode)
 
-#define EFFECT(NAME)    {&(NAME), 0}
+#define EFFECT(NAME,DURATION)    {&(NAME), (DURATION * 4)}
 
 // Idle effects
-
 NEWEFFECT( BlitzyIdle           );
 
 
-NEWEFFECT( RingRainbow       );
-NEWEFFECT( RingRadio         ); 
-NEWEFFECT( RingFlash         );  
-NEWEFFECT( SimpleSpectrum    );
-NEWEFFECT( WarpSpectrum      );
-NEWEFFECT( PinwheelSpectrum  );
-NEWEFFECT( ElevatorSpectrum  );
-NEWEFFECT( SolidColors       );
-NEWEFFECT( SolidSpectrum     );
-NEWEFFECT( SpotlightSpectrum );
-NEWEFFECT( SimpleColumns     );
-NEWEFFECT( Spotlight         );
-NEWEFFECT( CheckerBoard      );
-NEWEFFECT( Glitz             );
-NEWEFFECT( Barrel            );
-NEWEFFECT( LightTornado      );
-NEWEFFECT( SoothingRiser     );
-NEWEFFECT( Barrel            );
-                             
-NEWEFFECT( Overtime          );
+NEWEFFECT( RingRainbow          );
+NEWEFFECT( RingRadio            ); 
+NEWEFFECT( RingFlash            );  
+NEWEFFECT( SimpleSpectrum       );
+NEWEFFECT( WarpSpectrum         );
+NEWEFFECT( PinwheelSpectrum     );
+NEWEFFECT( ElevatorSpectrum     );
+NEWEFFECT( SolidColors          );
+NEWEFFECT( SolidSpectrum        );
+NEWEFFECT( SpotlightSpectrum    );
+NEWEFFECT( SimpleColumns        );
+NEWEFFECT( Spotlight            );
+NEWEFFECT( CheckerBoard         );
+NEWEFFECT( Glitz                );
+NEWEFFECT( Barrel               );
+NEWEFFECT( LightTornado         );
+NEWEFFECT( SoothingRiser        );
+NEWEFFECT( SoulWavesVertical    );
+NEWEFFECT( TheCMYKShuffle       );
+NEWEFFECT( Barrel               );
+NEWEFFECT( Accumulator          );
 
-
+NEWEFFECT( Overtime             );
 
 
 /*
@@ -81,40 +81,43 @@ int LightTornado      (Canvas *c, EffectManager *em, char mode);
 
 
 #define EFFECTS_NUM_IDLE 1
-#define EFFECTS_NUM_RING 2
-#define EFFECTS_NUM_CALL 11
+#define EFFECTS_NUM_RING 3
+#define EFFECTS_NUM_CALL 10
 #define EFFECTS_NUM_OVER 1
-
 static Effect effectsIdle[EFFECTS_NUM_IDLE] =
 { 
-    EFFECT( BlitzyIdle )
-//    {&Barrel,0}
+    EFFECT(BlitzyIdle, 64)
+//    EFFECT( Glitz , 64)
 };
 
 static Effect effectsRing[EFFECTS_NUM_RING] =
 { 
-    EFFECT( RingFlash )
-,   EFFECT( RingRainbow )
+    EFFECT(RingFlash, 128),
+    EFFECT(RingRainbow, 128),
+    EFFECT(RingRadio, 128)
+//,   EFFECT( Glitz , 64)
 };
 
 static Effect effectsCall[EFFECTS_NUM_CALL] =
 {
-    EFFECT( SpotlightSpectrum )
-,   EFFECT( Barrel )
-,   EFFECT( LightTornado )
-,   EFFECT( CheckerBoard )
-,   EFFECT( Spotlight )
-,   EFFECT( SoothingRiser )
-,   EFFECT( WarpSpectrum )
-,   EFFECT( ElevatorSpectrum )
-,   EFFECT( PinwheelSpectrum )
-,   EFFECT( Glitz )
-,   EFFECT( SolidColors )
+    EFFECT(Accumulator, 256),
+    EFFECT(SpotlightSpectrum, 256),
+// EFFECT(Barrel, 64),
+    EFFECT(WarpSpectrum, 256),
+// EFFECT( CheckerBoard , 64)
+// EFFECT(SoothingRiser, 64),
+    EFFECT(ElevatorSpectrum, 256),
+    EFFECT(LightTornado, 32),
+    EFFECT(TheCMYKShuffle, 64),
+    EFFECT(PinwheelSpectrum, 128),
+    EFFECT(Glitz, 64),
+    EFFECT(SolidSpectrum, 512),
+    EFFECT(SolidColors, 256)
 };
 
 static Effect effectsOver[EFFECTS_NUM_OVER] =
 { 
-    EFFECT( Overtime )
+    EFFECT( Overtime , 64)
 };
 
 

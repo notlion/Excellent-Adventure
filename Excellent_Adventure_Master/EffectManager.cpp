@@ -185,6 +185,11 @@ unsigned short EffectManager :: GetRandomNumber()
     return random(0xFFFF);
 }
 
+unsigned short EffectManager :: GetRandom(unsigned short max)
+{
+    return random(max);
+}
+
 // This just sets up the reboot mode and an initial reboot.  You must then
 // repeatedly check the status of the reboot.
 void EffectManager :: RebootPanels()
@@ -259,7 +264,15 @@ void EffectManager :: Poll
             )
             {
                 SetMode(EM_MODE_RING);
-                
+                if (switchEffect)
+                {
+                    m_currentRing++;
+                    if (m_currentRing >= m_sizeRing)
+                    {
+                        m_currentRing = 0;
+                    }
+                    effectCount = m_effectsRing[m_currentRing].duration;
+                }
             } else {
                 SetMode(EM_MODE_IDLE);
                 if (switchEffect)
@@ -269,6 +282,7 @@ void EffectManager :: Poll
                     {
                         m_currentIdle = 0;
                     }
+                    effectCount = m_effectsIdle[m_currentIdle].duration;
                 }
             }
             
@@ -290,14 +304,13 @@ void EffectManager :: Poll
                 
             if (switchEffect)
             {
-                
-
                 m_currentCall++;
                 if (m_currentCall >= m_sizeCall)
                 {
                     m_currentCall = 0;
                 }
-                effectCount = 64; //(GetRandomNumber() >> 6);
+                effectCount = m_effectsCall[m_currentCall].duration;
+
             }
             //currentEffect = m_currentCall;
             if (!offHook)
@@ -319,7 +332,7 @@ void EffectManager :: Poll
                 {
                     m_currentOver = 0;
                 }
-
+                effectCount = m_effectsOver[m_currentOver].duration;
             }            
             if (!offHook)
             {
@@ -372,6 +385,8 @@ void EffectManager :: Poll
                 {
                     m_currentRing = 0;
                 }
+                effectCount = m_effectsRing[m_currentRing].duration;
+
                 SET_EFFECT(m_effectsRing, &m_currentRing);
                 break;
             case EM_MODE_CALL:

@@ -43,7 +43,7 @@ struct Effect
                                                         EffectManager *,
                                                         char
                                                     );
-    int                                             flags;
+    int                                             duration;
 };
 
 
@@ -116,6 +116,7 @@ public:
     );
 
     unsigned short GetRandomNumber();
+    unsigned short GetRandom(unsigned short max);
 
     void InstallAnimator();
     unsigned short * GetSpectrum();
