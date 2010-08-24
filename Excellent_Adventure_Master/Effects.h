@@ -11,26 +11,26 @@
 NEWEFFECT( BlitzyIdle           );
 
 
-NEWEFFECT( RingRainbow          );
-NEWEFFECT( RingRadio            ); 
-NEWEFFECT( RingFlash            );  
-NEWEFFECT( SimpleSpectrum       );
-NEWEFFECT( WarpSpectrum         );
-NEWEFFECT( PinwheelSpectrum     );
-NEWEFFECT( ElevatorSpectrum     );
-NEWEFFECT( SolidColors          );
-NEWEFFECT( SolidSpectrum        );
-NEWEFFECT( SpotlightSpectrum    );
-NEWEFFECT( SimpleColumns        );
-NEWEFFECT( Spotlight            );
-NEWEFFECT( CheckerBoard         );
-NEWEFFECT( Glitz                );
-NEWEFFECT( Barrel               );
-NEWEFFECT( LightTornado         );
-NEWEFFECT( SoothingRiser        );
-NEWEFFECT( Barrel               );
-
-NEWEFFECT( Overtime             );
+NEWEFFECT( RingRainbow       );
+NEWEFFECT( RingRadio         ); 
+NEWEFFECT( RingFlash         );  
+NEWEFFECT( SimpleSpectrum    );
+NEWEFFECT( WarpSpectrum      );
+NEWEFFECT( PinwheelSpectrum  );
+NEWEFFECT( ElevatorSpectrum  );
+NEWEFFECT( SolidColors       );
+NEWEFFECT( SolidSpectrum     );
+NEWEFFECT( SpotlightSpectrum );
+NEWEFFECT( SimpleColumns     );
+NEWEFFECT( Spotlight         );
+NEWEFFECT( CheckerBoard      );
+NEWEFFECT( Glitz             );
+NEWEFFECT( Barrel            );
+NEWEFFECT( LightTornado      );
+NEWEFFECT( SoothingRiser     );
+NEWEFFECT( Barrel            );
+                             
+NEWEFFECT( Overtime          );
 
 
 

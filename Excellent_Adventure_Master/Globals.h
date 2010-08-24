@@ -7,7 +7,7 @@
 //#define USE_MAPLE
 
 
-#define USE_UART
+//#define USE_UART
 
 // You must enable the UART to use the simulator.  Using the simulator will
 // disable the I2C panel communications.
@@ -21,11 +21,11 @@
 // DEBUG enabling:
 
 // Enable debug messages for the power management
-#define PM_DEBUG_ENABLE
+//#define PM_DEBUG_ENABLE
 
 
 // Enable debug messages for the effect manager
-#define EM_DEBUG_ENABLE
+//#define EM_DEBUG_ENABLE
 
 // Turns off the blittin (will not show anything on panels if you enable
 // this):

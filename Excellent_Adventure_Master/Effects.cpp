@@ -181,7 +181,6 @@ int PinwheelSpectrum(Canvas *c, EffectManager *em, char mode)
 {
     static int step = 0;
     
-    
     for(char y = 0; y < CANVAS_HEIGHT; y++){
         for(char x = 0; x < CANVAS_WIDTH; x++){
             int angle = MOD32(int(atan2(y * 100 - CTRY, x * 100 - CTRX) * TWO_PI_TO_32) + step);
