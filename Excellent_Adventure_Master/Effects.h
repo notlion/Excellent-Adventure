@@ -25,12 +25,11 @@ NEWEFFECT( SimpleColumns        );
 NEWEFFECT( Spotlight            );
 NEWEFFECT( CheckerBoard         );
 NEWEFFECT( Glitz                );
-NEWEFFECT( Barrel               );
 NEWEFFECT( LightTornado         );
 NEWEFFECT( SoothingRiser        );
 NEWEFFECT( SoulWavesVertical    );
 NEWEFFECT( TheCMYKShuffle       );
-NEWEFFECT( Barrel               );
+NEWEFFECT( Old16Colors          );
 
 NEWEFFECT( Overtime             );
 
@@ -84,7 +83,7 @@ int LightTornado      (Canvas *c, EffectManager *em, char mode);
 
 #define EFFECTS_NUM_IDLE 1
 #define EFFECTS_NUM_RING 3
-#define EFFECTS_NUM_CALL 12
+#define EFFECTS_NUM_CALL 13
 #define EFFECTS_NUM_OVER 1
 static Effect effectsIdle[EFFECTS_NUM_IDLE] =
 { 
@@ -102,7 +101,7 @@ static Effect effectsRing[EFFECTS_NUM_RING] =
 static Effect effectsCall[EFFECTS_NUM_CALL] =
 {
     EFFECT( SpotlightSpectrum , 64)
-,   EFFECT( Barrel , 64)
+,   EFFECT( Old16Colors , 64)
 ,   EFFECT( LightTornado , 64)
 ,   EFFECT( CheckerBoard , 64)
 ,   EFFECT( Spotlight , 64)
@@ -110,6 +109,7 @@ static Effect effectsCall[EFFECTS_NUM_CALL] =
 ,   EFFECT( WarpSpectrum , 64)
 ,   EFFECT( ElevatorSpectrum , 64)
 ,   EFFECT( TheCMYKShuffle , 64)
+,   EFFECT( SoulWavesVertical , 64)
 ,   EFFECT( PinwheelSpectrum , 64)
 ,   EFFECT( Glitz , 64)
 ,   EFFECT( SolidColors , 64)

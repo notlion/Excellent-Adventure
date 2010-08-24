@@ -389,7 +389,12 @@ void EffectManager :: Poll
                 // The current time so we can shut down the effects if the
                 // person is taking too long
                 m_duration = time;
-                effectCount = 0;
+                m_currentCall++;
+                if (m_currentCall >= m_sizeCall)
+                {
+                    m_currentCall = 0;
+                }
+                effectCount = m_effectsCall[m_currentCall].duration;
                 LaserOn();
                 m_laserCallCount = EM_LASER_CALL_COUNT;
                 // Restore the lights!

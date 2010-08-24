@@ -596,41 +596,47 @@ int Glitz(Canvas *c, EffectManager *em, char mode)
     }   
 }
 
-int Barrel(Canvas *c, EffectManager *em, char mode)
+int Old16Colors(Canvas *c, EffectManager *em, char mode)
 {
+    static char n = 0;
     static char bgColor = 0;
-    static char yOffset = 0;
+    if (n & 1)
+    {
+        bgColor++;
+    }
 
     Color_t bgRaw = colorwheel_lut[bgColor & 31];
 
     Channel_t bgR = RED(bgRaw) << 3;
     Channel_t bgG = GREEN(bgRaw) << 3;
     Channel_t bgB = BLUE(bgRaw) << 3;
-    yOffset++;
-    bgColor++;
-
+    
     for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
     {
-        Channel_t sin = sin_lut[((y << 1)+yOffset) & 31];
-        
-        Channel_t r = MAX((char)(bgR - sin), 0);
-        Channel_t g = MAX((char)(bgG - sin), 0);
-        Channel_t b = MAX((char)(bgB - sin), 0);
-        Color_t color = COLOR_B(r, g, b);
+        //Channel_t r = MAX((char)(bgR >> y), 0);
+        //Channel_t g = MAX((char)(bgG >> y), 0);
+        //Channel_t b = MAX((char)(bgB >> y), 0);
 
         //Color_t rowBG = COLOR_B(r, g, b);
-
+        char yy = ((CANVAS_HEIGHT - y) >> 3);
         for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
         {
-            //Color_t rowBG = colorwheel_lut[(yOffset+y+x) & 31];
-            //Channel_t r = MAX((char)(bgR >> (y >> 2)), 0);
-            //Channel_t g = MAX((char)(bgG >> (y >> 2)), 0);
-            //Channel_t b = MAX((char)(bgB >> (y >> 2)), 0);
+            Color_t rowBG = colorwheel_lut[(n+y+x) & 31];
+            Channel_t r = MAX((char)(bgR >> yy), 0);
+            Channel_t g = MAX((char)(bgG >> yy), 0);
+            Channel_t b = MAX((char)(bgB >> yy), 0);
+            Color_t color = COLOR_B(r, g, b);
 
-            c->PutPixel(x,y, color);
+            char n = (x + y + n) & 7;
+            if (n == 0)
+            { 
+                c->PutPixel(x,y, COLOR(31,31,0));
+            } else {
+                c->PutPixel(x,y, color);
+            }
         }
-        
-    }   
+    }
+    n++;
 }
 
 
