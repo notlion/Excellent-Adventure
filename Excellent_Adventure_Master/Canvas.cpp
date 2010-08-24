@@ -149,8 +149,14 @@ Canvas :: Canvas()
     m_who = 0;
 #ifdef MEMORY_DYNAMIC    
     m_ceiling = (Color_t *)malloc(sizeof(Color_t) * CEILING_LIGHTS);
+
+#ifdef CANVAS_PAGES
     m_canvas[0] = (Color_t *)malloc(sizeof(Color_t) * CANVAS_MEMORY_SIZE);
     m_canvas[1] = (Color_t *)malloc(sizeof(Color_t) * CANVAS_MEMORY_SIZE);
+#else
+    m_canvas = (Color_t *)malloc(sizeof(Color_t) * CANVAS_MEMORY_SIZE);
+#endif
+
 #endif
     Clear();
 }
@@ -164,8 +170,14 @@ void Canvas :: Destroy()
 {
 #ifdef MEMORY_DYNAMIC    
     free(m_ceiling);
+
+#ifdef CANVAS_PAGES
     free(m_canvas[0]);
     free(m_canvas[1]);
+#else
+    free(m_canvas);
+#endif
+
 #endif
 }
 
@@ -435,8 +447,14 @@ void Canvas :: Clear
 //#else
     // For some reason the Maple does not support this *fundamental* function,
     // or I can't find it.
+
+#ifdef CANVAS_PAGES
     Color_t *memory =       &m_canvas[m_who][0];
     Color_t *end =          &m_canvas[m_who][CANVAS_MEMORY_SIZE];
+#else
+    Color_t *memory =       &m_canvas[0];
+    Color_t *end =          &m_canvas[CANVAS_MEMORY_SIZE];
+#endif
     do
     {
         *(memory++) = color;
@@ -551,8 +569,11 @@ void Canvas :: PutPixel
     // x = 3, y = 7
     // 7 << wS = 112 // 8th row of 16px wide
     // 112 + 3 = 115 // 4th col of that row
-
+#ifdef CANVAS_PAGES
     m_canvas[m_who][XY_TO_LINEAR(x,y)] = color;
+#else
+    m_canvas[XY_TO_LINEAR(x,y)] = color;
+#endif
 }
 
 Color_t Canvas :: GetPixel
@@ -569,7 +590,11 @@ Color_t Canvas :: GetPixel
     // 7 << wS = 112 // 8th row of 16px wide
     // 112 + 3 = 115 // 4th col of that row
 
+#ifdef CANVAS_PAGES
     return m_canvas[m_who][XY_TO_LINEAR(x,y)];
+#else
+    return m_canvas[XY_TO_LINEAR(x,y)];
+#endif
 }
 
 ColorCeiling_t Canvas :: GetPixelCeiling
@@ -583,7 +608,11 @@ ColorCeiling_t Canvas :: GetPixelCeiling
 
 Color_t * Canvas :: GetCanvas()
 {
+#ifdef CANVAS_PAGES
     return &m_canvas[m_who][0];
+#else
+    return &m_canvas[0];
+#endif
 }
 
 

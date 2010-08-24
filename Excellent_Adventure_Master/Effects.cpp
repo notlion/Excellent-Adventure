@@ -175,16 +175,16 @@ int ElevatorSpectrum(Canvas *c, EffectManager *em, char mode)
     return 1;
 }
 
+#define CTRX ((CANVAS_WM1 * 100) / 2)
+#define CTRY ((CANVAS_HM1 * 100) / 2)
 int PinwheelSpectrum(Canvas *c, EffectManager *em, char mode)
 {
     static int step = 0;
     
-    static int ctrx = (CANVAS_WM1 * 100) / 2;
-    static int ctry = (CANVAS_HM1 * 100) / 2;
     
     for(char y = 0; y < CANVAS_HEIGHT; y++){
         for(char x = 0; x < CANVAS_WIDTH; x++){
-            int angle = MOD32(int(atan2(y * 100 - ctry, x * 100 - ctrx) * TWO_PI_TO_32) + step);
+            int angle = MOD32(int(atan2(y * 100 - CTRY, x * 100 - CTRX) * TWO_PI_TO_32) + step);
             c->PutPixel(x, y, colorwheel_lut[angle]);
         }
     }
@@ -551,6 +551,122 @@ int Overtime(Canvas *c, EffectManager *em, char mode)
     return 1;
 }
 
+
+int Glitz(Canvas *c, EffectManager *em, char mode)
+{
+    static char bgColor = 0;
+    static char yOffSet = 0;
+
+    Color_t bgRaw = colorwheel_lut[bgColor & 31];
+
+    Channel_t bgR = RED(bgRaw) << 3;
+    Channel_t bgG = GREEN(bgRaw) << 3;
+    Channel_t bgB = BLUE(bgRaw) << 3;
+    yOffSet++;
+    bgColor++;
+
+    for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
+    {
+        Channel_t sin = sin_lut[((y << 1)+yOffSet) & 31];
+        
+        Channel_t r = MAX((char)(bgR - sin), 0);
+        Channel_t g = MAX((char)(bgG - sin), 0);
+        Channel_t b = MAX((char)(bgB - sin), 0);
+        Color_t color = COLOR_B(r, g, b);
+
+        //Color_t rowBG = COLOR_B(r, g, b);
+
+        for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
+        {
+            //Color_t rowBG = colorwheel_lut[(yOffset+y+x) & 31];
+            //Channel_t r = MAX((char)(bgR >> (y >> 2)), 0);
+            //Channel_t g = MAX((char)(bgG >> (y >> 2)), 0);
+            //Channel_t b = MAX((char)(bgB >> (y >> 2)), 0);
+
+            c->PutPixel(x,y, color);
+        }
+        
+    }   
+}
+
+int Barrel(Canvas *c, EffectManager *em, char mode)
+{
+    static char bgColor = 0;
+    static char yOffset = 0;
+    static char xOffset = 0;
+
+    Color_t bgRaw = colorwheel_lut[bgColor & 31];
+
+    Channel_t bgR = RED(bgRaw) << 3;
+    Channel_t bgG = GREEN(bgRaw) << 3;
+    Channel_t bgB = BLUE(bgRaw) << 3;
+    yOffset++;
+    bgColor++;
+
+    if (yOffset & 1)
+    {
+        xOffset++;
+    }
+
+    for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
+    {
+        Channel_t sin = sin_lut[((y << 1)+yOffset+4) & 31];
+        
+
+        //Color_t rowBG = COLOR_B(r, g, b);
+        
+        for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
+        {
+            Channel_t sin2 = sin_lut[((x << 1)+xOffset+4) & 31];
+            unsigned char theSin = (sin - sin2);
+            Channel_t r = MAX(bgR - theSin, 0) >> 3;
+            Channel_t g = MAX(bgG - theSin, 0) >> 3;
+            Channel_t b = MAX(bgB - theSin, 0) >> 3;
+            Color_t color = COLOR_B(r, g, b);
+
+            c->PutPixel(x,y, color);
+        }
+        
+    }   
+}
+
+
+int SoothingRiser(Canvas *c, EffectManager *em, char mode)
+{
+    static char bgColor = 0;
+    static char yOffSet = 0;
+
+    Color_t bgRaw = colorwheel_lut[bgColor & 31];
+
+    Channel_t bgR = RED(bgRaw) << 3;
+    Channel_t bgG = GREEN(bgRaw) << 3;
+    Channel_t bgB = BLUE(bgRaw) << 3;
+    yOffSet++;
+    bgColor++;
+
+    for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
+    {
+        Channel_t sin = sin_lut[((y << 1)+yOffSet+4) & 31];
+        
+        Channel_t r = MAX(bgR - sin, 0) >> 3;
+        Channel_t g = MAX(bgG - sin, 0) >> 3;
+        Channel_t b = MAX(bgB - sin, 0) >> 3;
+        Color_t color = COLOR_B(r, g, b);
+
+        //Color_t rowBG = COLOR_B(r, g, b);
+
+        for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
+        {
+            //Color_t rowBG = colorwheel_lut[(yOffset+y+x) & 31];
+            //Channel_t r = MAX((char)(bgR >> (y >> 2)), 0);
+            //Channel_t g = MAX((char)(bgG >> (y >> 2)), 0);
+            //Channel_t b = MAX((char)(bgB >> (y >> 2)), 0);
+
+            c->PutPixel(x,y, color);
+        }
+        
+    }   
+}
 
 
 int LightTornado(Canvas *c, EffectManager *em, char mode)

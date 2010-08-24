@@ -92,6 +92,8 @@ typedef unsigned char       Channel_t;
 #define NORMAL_SCALE        (-2)
 #define BRIGHT_SCALE        (-3)
 
+// Enable to allow two pages of memory
+//#define CANVAS_PAGES        
 
 // Yes, the compiler IS stupid enough to not properly perform shifts without
 // corrupting the upper bytes.
@@ -169,10 +171,21 @@ class Canvas
     // Internally we use a canvas with a height a power of 2
 
 #ifdef MEMORY_DYNAMIC
+ #ifdef CANVAS_PAGES
     Color_t                                     *   m_canvas[2];
+ #else
+    Color_t                                     *   m_canvas;
+ #endif
     Color_t                                     *   m_ceiling;
 #else
+
+ #ifdef CANVAS_PAGES
     Color_t                                         m_canvas[2][CANVAS_MEMORY_SIZE];
+ #else
+    Color_t                                         m_canvas[CANVAS_MEMORY_SIZE];
+ #endif
+
+
     Color_t                                         m_ceiling[CEILING_LIGHTS];
 #endif
     char                                            m_who;
