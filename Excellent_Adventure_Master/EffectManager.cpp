@@ -336,6 +336,8 @@ void EffectManager :: Poll
 
         if (m_modePrevious != m_mode)
         {
+            m_modePrevious = m_mode;
+
             // All variables in this section must be persistent
             runEffects = false;
             // Triggered once per mode change.
@@ -383,17 +385,18 @@ void EffectManager :: Poll
                 // The call ended, fade those panels out.
                 m_canvas.FadeToBlack();
 
-                EM_DEBUG2("EM:   State: CALLENDED: time: ");
-                EM_DEBUG((unsigned long)time);
-                EM_DEBUG2("EM:   State: CALLENDED: poll: ");
-                EM_DEBUG((unsigned long)m_pollDelay);
+                //EM_DEBUG2("EM:   State: CALLENDED: time: ");
+                //EM_DEBUG((unsigned long)time);
+                //EM_DEBUG2("EM:   State: CALLENDED: poll: ");
+                //EM_DEBUG((unsigned long)m_pollDelay);
 
                 m_pollDelay += EM_FADE_DELAY_MS;
-                EM_DEBUG2("EM:   State: CALLENDED: poll: ");
-                EM_DEBUG((unsigned long)m_pollDelay);
-                EM_DEBUG("EM:   State: CALLENDED (fading command issued)");
+                //EM_DEBUG2("EM:   State: CALLENDED: poll: ");
+                //EM_DEBUG((unsigned long)m_pollDelay);
+                //EM_DEBUG("EM:   State: CALLENDED (fading command issued)");
                 
                 SetMode(EM_MODE_CALLENDED_FADE_END);
+                //EM_DEBUG("EM:   State: CALLENDED - FINISH");
                 break;
             case EM_MODE_CALLENDED_FADE_END:
                 EM_DEBUG("EM:   State: CALLENDED FADEEND");
@@ -431,9 +434,9 @@ void EffectManager :: Poll
                 EM_DEBUG("EM:   State: DISABLE_STANDBY - Low power mode activated.");
                 break;
             default:
+                EM_DEBUG("EM:   State: UNKNOWN!");
                 break;
             };
-            m_modePrevious = m_mode;
         }
         if (runEffects)
         {
@@ -483,9 +486,7 @@ void EffectManager :: Poll
             //EM_DEBUG((int)(ringer));
             //Effect *theEffect = (effects + (*currentEffect));
             
-#ifdef EM_DEBUG_NOBLIT
-            //EM_DEBUG("BLIT!");
-#else
+#ifndef EM_DEBUG_NOBLIT
             m_canvas.BlitToPanels();
 #endif
         }

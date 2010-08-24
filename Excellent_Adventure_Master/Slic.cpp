@@ -75,18 +75,18 @@ void SLICControl :: Poll
 
 
 #ifdef SLIC_DEBUG_OFFON_LOCAL
-        static int timer = 20000;
-        if (timer > 10000)
+        static int timer = 6000;
+        if (timer > 3000)
         {
             timer--;
             m_debounceLocal = DEBOUNCE_ALL_ONES;
         } 
-        else if (timer > 5000)
+        else if (timer > 0)
         {
             timer--;
             m_debounceLocal = DEBOUNCE_ALL_ZEROS;
         } else {
-            timer = 20000;
+            timer = 6000;
         }
             
 #endif
@@ -249,8 +249,8 @@ void SLICControl :: RingLocal()
             // increment to 1
             m_ringCountLocal = 0;
         }
-        SC_DEBUG2("SC:   LOCAL: RING COUNT ");
-        SC_DEBUG((int)m_ringCountLocal);
+        //SC_DEBUG2("SC:   LOCAL: RING COUNT ");
+        //SC_DEBUG((int)m_ringCountLocal);
     }
 
     if ((m_isRingingLocal == RINGING_OFF) && (m_ringCountLocal < RING_CADENCE_NUMER))
@@ -285,8 +285,8 @@ void SLICControl :: RingRemote()
             // increment to 1
             m_ringCountRemote = 0;
         }
-        SC_DEBUG2("SC:   REMOTE: RING COUNT ");
-        SC_DEBUG((int)m_ringCountRemote);
+        //SC_DEBUG2("SC:   REMOTE: RING COUNT ");
+        //SC_DEBUG((int)m_ringCountRemote);
     }
 
     // One second on, two seconds off.

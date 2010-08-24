@@ -326,8 +326,8 @@ void Canvas :: BlitToPanels()
     // Sets the color immediately ('n')
     // Fade to color ('c')
 
-    RGB[0] = 'o';
-    I2C_WRITE(ADDR_ALL_PIXELS, RGB, 1);
+    //RGB[0] = 'o';
+    //I2C_WRITE(ADDR_ALL_PIXELS, RGB, 1);
 
 
     RGB[0] = 'c';
