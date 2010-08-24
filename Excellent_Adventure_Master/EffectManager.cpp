@@ -10,8 +10,10 @@
 
 #ifdef EM_DEBUG_ENABLE
 #define EM_DEBUG(MSG)  PRINTLN(MSG)
+#define EM_DEBUG2(MSG) PRINT(MSG)
 #else
 #define EM_DEBUG(MSG)
+#define EM_DEBUG2(MSG) PRINT(MSG)
 #endif
 
 #define SET_EFFECT(EFFECT,CURRENT_EFFECT)                                   \
@@ -380,7 +382,17 @@ void EffectManager :: Poll
                 EM_DEBUG("EM:   State: CALLENDED");
                 // The call ended, fade those panels out.
                 m_canvas.FadeToBlack();
+
+                EM_DEBUG2("EM:   State: CALLENDED: time: ");
+                EM_DEBUG((unsigned long)time);
+                EM_DEBUG2("EM:   State: CALLENDED: poll: ");
+                EM_DEBUG((unsigned long)m_pollDelay);
+
                 m_pollDelay += EM_FADE_DELAY_MS;
+                EM_DEBUG2("EM:   State: CALLENDED: poll: ");
+                EM_DEBUG((unsigned long)m_pollDelay);
+                EM_DEBUG("EM:   State: CALLENDED (fading command issued)");
+                
                 SetMode(EM_MODE_CALLENDED_FADE_END);
                 break;
             case EM_MODE_CALLENDED_FADE_END:
