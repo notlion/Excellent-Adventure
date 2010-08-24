@@ -206,6 +206,24 @@ void Canvas :: InitPanels ()
     */
 }
 
+void Canvas :: ReinitPanels()
+{
+    I2C_BEGIN_TRANSMISSION(ADDR_ALL_PIXELS);
+    I2C_WRITE1('o');
+    I2C_END_TRANSMISSION;
+
+    // Set fade speed
+    //data[0] = 'f';
+    //data[1] = 16;
+    //I2C_WRITE(ADDR_ALL_PIXELS, data, 2);
+
+    I2C_BEGIN_TRANSMISSION(ADDR_ALL_PIXELS);
+    I2C_WRITE1('f');
+    I2C_WRITE1(192);
+    I2C_END_TRANSMISSION;
+}
+
+
 void Canvas :: BlitToPanelsInterpolate
 (
     bool                                            page,
@@ -329,7 +347,7 @@ void Canvas :: BlitToPanels()
     //RGB[0] = 'o';
     //I2C_WRITE(ADDR_ALL_PIXELS, RGB, 1);
 
-
+    ReinitPanels();
     RGB[0] = 'c';
 #endif
     // Obtain the first address of our panels:

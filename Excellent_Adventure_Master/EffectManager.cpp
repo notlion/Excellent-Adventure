@@ -206,8 +206,8 @@ bool EffectManager :: RebootComplete()
             {
                 EM_DEBUG("EM:   Rebooting panels... powering up.");
                 m_rebootingPowerUp = true;
-            } else {           
                 m_pm->PowerUp();
+            } else {           
                 EM_DEBUG("EM:   Reboot complete!");
                 // Idea: wait another bit before switching mode?
                 m_rebooting = false;
@@ -278,8 +278,20 @@ void EffectManager :: Poll
             }
             break;
         case EM_MODE_CALL:
+            if (m_laserCallCount == 0)
+            {
+                LaserOff();
+                m_laserCallCount = -1;
+            }
+            else if (m_laserCallCount > 0)
+            {
+                m_laserCallCount--;
+            }
+                
             if (switchEffect)
             {
+                
+
                 m_currentCall++;
                 if (m_currentCall >= m_sizeCall)
                 {
@@ -349,11 +361,11 @@ void EffectManager :: Poll
             case EM_MODE_IDLE:
                 EM_DEBUG("EM:   State: IDLE");
                 LaserOff();
-                m_canvas.ClearCeiling(0);
                 SET_EFFECT(m_effectsIdle, &m_currentIdle);
                 break;
             case EM_MODE_RING:
                 EM_DEBUG("EM:   State: RING");
+                m_canvas.ClearCeiling(0);
                 LaserOn();
                 m_currentRing++;
                 if (m_currentRing >= m_sizeRing)
@@ -364,11 +376,12 @@ void EffectManager :: Poll
                 break;
             case EM_MODE_CALL:
                 EM_DEBUG("EM:   State: CALL");
-                LaserOff(); 
                 // The current time so we can shut down the effects if the
                 // person is taking too long
                 m_duration = time;
                 effectCount = 0;
+                LaserOn();
+                m_laserCallCount = EM_LASER_CALL_COUNT;
                 // Restore the lights!
                 m_canvas.ClearCeiling(0);
                 SET_EFFECT(m_effectsCall, &m_currentCall);
@@ -387,6 +400,7 @@ void EffectManager :: Poll
                 break;  
             case EM_MODE_CALLENDED:
                 EM_DEBUG("EM:   State: CALLENDED");
+                LaserOff();
                 // The call ended, fade those panels out.
                 m_canvas.FadeToBlack();
 
@@ -423,6 +437,7 @@ void EffectManager :: Poll
                 break;
             case EM_MODE_DISABLE:
                 EM_DEBUG("EM:   State: DISABLE - Fading panels");
+                LaserOff();
                 // Fade out
                 m_canvas.FadeToBlack();
                 m_pollDelay += EM_FADE_DELAY_MS; // 2 seconds delay

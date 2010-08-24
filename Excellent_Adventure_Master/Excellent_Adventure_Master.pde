@@ -128,6 +128,12 @@ void setup()
     watchdogTime0 = time;
 #endif
     //EM.InstallAnimator();
+    EM.RebootPanels();
+
+    while (!EM.RebootComplete())
+    {
+        PM.Poll(millis());
+    }
 }
 
 // Both on hook -> enable ringing

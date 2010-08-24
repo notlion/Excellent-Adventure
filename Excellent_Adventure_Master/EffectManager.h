@@ -67,7 +67,7 @@ class EffectManager
     char                                            m_currentCall;
     char                                            m_sizeOver;
     char                                            m_currentOver;
-
+    int                                             m_laserCallCount;
     // m_disablePanels tells the system to disable the panels.
     // m_panelsDisabled is the status
     bool                                            m_disablePanels;

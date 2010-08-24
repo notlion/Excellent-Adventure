@@ -35,7 +35,7 @@
 // Show messages in the SLIC:
 #define SC_DEBUG_ENABLE
 
-#define PM_POWER_UP_DELAY_MS            1024
+#define PM_POWER_UP_DELAY_MS            0
 
 #define WATCHDOG_PERIOD_MS              8192
 
@@ -50,6 +50,9 @@
 // This will make the local offhook alternate from offhook to onhook about
 // every 5-10 seconds
 //#define SLIC_DEBUG_OFFON_LOCAL
+
+#define EM_LASER_CALL_COUNT             128
+
 
 #define LASER_TIME_ON_MS                512
 #define LASER_TIME_OFF_MS               128

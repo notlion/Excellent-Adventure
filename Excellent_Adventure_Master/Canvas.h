@@ -184,6 +184,7 @@ public:
 
     // The firstID is the ID of the first pixel in the panels.
     void InitPanels();
+    void ReinitPanels();
     void BlitToPanels();
     void BlitToPanelsInterpolate
     (
@@ -233,7 +234,7 @@ public:
     (
         char                                        n
     );
-    
+     
 
     Color_t * GetCanvas ();
 

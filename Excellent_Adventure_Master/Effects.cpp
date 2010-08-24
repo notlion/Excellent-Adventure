@@ -4,6 +4,13 @@
 #include "Canvas.h"
 #include "Spectrum.h"
 
+#ifndef MAX(a,b)
+#define MAX(a,b) (a) > (b) ? (a) : (b)
+#endif
+
+#ifndef MIN(a,b)
+#define MIN(a,b) (a) < (b) ? (a) : (b)
+#endif
 
 int SimpleSpectrum(Canvas *c, EffectManager *em, char mode)
 {
@@ -548,34 +555,68 @@ int Overtime(Canvas *c, EffectManager *em, char mode)
 
 int LightTornado(Canvas *c, EffectManager *em, char mode)
 {
-    static char xOffset = 0;
+    static int xOffset = 0;
+    static int xOffsetVel = 0;
+    static char xOffsetAcc = 1;
     static char yOffset = 0;
 
     static char bgColor = 0;
-    Color_t bg = colorwheel_lut[bgColor];
-    Channel_t bgR = RED(bg);
-    Channel_t bgG = GREEN(bg);
-    Channel_t bgB = BLUE(bg);
+
+    //static char count = 0;
+
+    Color_t bgRaw = colorwheel_lut[bgColor];
+
+    Channel_t bgR = RED(bgRaw);
+    Channel_t bgG = GREEN(bgRaw);
+    Channel_t bgB = BLUE(bgRaw);
     
-    yOffset++;
-    xOffset++;
+    //if (n & 1)
+    {
+        bgColor++;
+        //yOffset++;
+        //yOffset
+        xOffset += (xOffsetVel >> 4);
+        //n = 0;
+    }
+
+    //if (n & 1)
+    {
+        xOffsetVel += xOffsetAcc;
+
+        if ( (xOffsetAcc > 0) && (xOffsetVel > 1024))
+        {
+            xOffsetAcc = -1;
+        } 
+        else if ( (xOffsetAcc < 0) && (xOffsetVel < -1024))
+        {
+            xOffsetAcc = 1;
+        }
+    }
+
+    //n++;
 
     for (unsigned char y = 0; y < CANVAS_HEIGHT; y++)
     {
-        Channel_t r = (bgR + y) & CHANNEL_MASK;
-        Channel_t g = (bgG + y) & CHANNEL_MASK;
-        Channel_t b = (bgB + y) & CHANNEL_MASK;
+        //Channel_t r = MAX((char)(bgR >> y), 0);
+        //Channel_t g = MAX((char)(bgG >> y), 0);
+        //Channel_t b = MAX((char)(bgB >> y), 0);
 
-        Color_t rowBG = COLOR_B(r, g, b);
+        //Color_t rowBG = COLOR_B(r, g, b);
 
         for (unsigned char x = 0; x < CANVAS_WIDTH; x++)
         {
-            char n = (x + y + xOffset + yOffset) & 3;
+            Color_t rowBG = colorwheel_lut[(yOffset+y+x) & 31];
+            Channel_t r = MAX((char)(bgR >> (y >> 2)), 0);
+            Channel_t g = MAX((char)(bgG >> (y >> 2)), 0);
+            Channel_t b = MAX((char)(bgB >> (y >> 2)), 0);
+            Color_t color = COLOR_B(r, g, b);
+
+            char n = (x + y + xOffset) & 3;
             if (n == 0)
             { 
                 c->PutPixel(x,y, COLOR_WHITE);
             } else {
-                c->PutPixel(x,y, rowBG);
+                c->PutPixel(x,y, color);
             }
         }
         

@@ -43,6 +43,7 @@ int Overtime          (Canvas *c, EffectManager *em, char mode);
 static Effect effectsIdle[EFFECTS_NUM_IDLE] =
 { 
     {&BlitzyIdle, 0}
+//    {&LightTornado,0}
 };
 
 static Effect effectsRing[EFFECTS_NUM_RING] =
@@ -54,8 +55,10 @@ static Effect effectsRing[EFFECTS_NUM_RING] =
 static Effect effectsCall[EFFECTS_NUM_CALL] =
 {
 //    {&SpotlightSpectrum, 0}
-     {&CheckerBoard, 0}
-// ,   {&Spotlight, 0}
+    {&LightTornado,0} 
+    //{&CheckerBoard, 0}
+
+     // ,   {&Spotlight, 0}
 // ,   {&WarpSpectrum, 0}
 // ,   {&ElevatorSpectrum, 0}
 // ,   {&PinwheelSpectrum, 0}
